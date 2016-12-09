@@ -9,7 +9,7 @@ vectors but not bitmaps.
 # Requirements 
 
 * perl, bash, Mac OS X
-* [pandoc](http://pandoc.org/installing.html)
+* [pandoc](http://pandoc.org/) — best install the Mac [prebuilt package](https://github.com/jgm/pandoc/releases/)
 * Java [wmf2svg](https://github.com/hidekatsu-izuno/wmf2svg) — build with `ant`, unzip, move `wmf2svg-0.9.8.jar` to `/usr/local/java`
 * Java [batik](https://xmlgraphics.apache.org/batik/download.html) — place `batik` folder in `/usr/local/java`
 * [`libwmf wmf2svg`](http://wvware.sourceforge.net/libwmf.html) — `brew install libwmf`
@@ -19,6 +19,6 @@ vectors but not bitmaps.
 If your file is `mydoc.docx`, run `docxtomd.sh mydoc`
 
 # License
-Copyright (c) 2016 by Adam Twardoch
-[https://github.com/twardoch/markdown-utils](https://github.com/twardoch/markdown-utils)
-Licensed under Apache 2.0
+Copyright (c) 2016 by Adam Twardoch [https://github.com/twardoch/markdown-utils](https://github.com/twardoch/markdown-utils).
+
+Licensed under Apache 2.0.
