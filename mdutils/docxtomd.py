@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""docxtomd 0.3.1
+"""docxtomd 0.3.2
   Word .docx to Markdown converter
   Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
   https://github.com/twardoch/markdown-utils
@@ -147,7 +147,13 @@ class DocxToMdConverter(object):
 
         pdFilters = [os.path.join(os.path.dirname(__file__),'pandoc_mapmedia.py')]
 
-        pdMdExt = ['-pipe_tables', '+auto_identifiers', '+backtick_code_blocks', '+blank_before_blockquote', '+blank_before_header', '+bracketed_spans', '+definition_lists', '+escaped_line_breaks', '+fenced_code_attributes', '+footnotes', '+grid_tables', '+header_attributes', '+implicit_header_references', '+line_blocks', '+pandoc_title_block']
+        pdMdExt = [
+            '+pipe_tables', '+auto_identifiers', '+backtick_code_blocks', 
+            '+blank_before_blockquote', '+blank_before_header', '+bracketed_spans', 
+            '+definition_lists', '+escaped_line_breaks', '+fenced_code_attributes', 
+            '+footnotes', '+header_attributes', '+implicit_header_references', 
+            '+line_blocks', '+pandoc_title_block'
+            ]
         pdMdOutFmt = 'markdown_github' + ''.join(pdMdExt)
 
         args = [self.pandoc]
@@ -204,9 +210,19 @@ class DocxToMdConverter(object):
             warnings.warn("Install: pip install --user Markdown")
         else: 
             try: 
+                mdexts = [
+                    'markdown.extensions.admonition', 'markdown.extensions.attr_list', 
+                    'markdown.extensions.def_list', 'markdown.extensions.footnotes', 
+                    'markdown.extensions.meta', 'markdown.extensions.smarty', 
+                    'markdown.extensions.tables', 'markdown.extensions.tables', 
+                    'markdown.extensions.toc', 
+                    'pymdownx.betterem', 'pymdownx.headeranchor', 'pymdownx.magiclink', 
+                    'pymdownx.mark', 'pymdownx.superfences', 
+                    'mdx_sections', 'markdown-figures.captions', 'markdown-wikilinks.gollum',
+                     ]
                 mdfile = codecs.open(self.outputpath, mode="r", encoding="utf-8")
                 md = mdfile.read()
-                html = markdown.markdown(md)
+                html = markdown.markdown(md, extensions=mdexts)
                 htmlfile = codecs.open(os.path.splitext(self.outputpath)[0] + ".html", 
                     "w", encoding="utf-8", errors="xmlcharrefreplace")
                 htmlfile.write(html)

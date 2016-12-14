@@ -1,3 +1,8 @@
 Markdown>=2.6.7
 pandocfilters>=1.4.1
 scour>=0.35
+pymdown-extensions
+markdown-include
+mdx_sections
+git+https://github.com/twardoch/markdown-figures.git
+git+https://github.com/twardoch/markdown-wikilinks.git
