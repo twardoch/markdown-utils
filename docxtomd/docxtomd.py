@@ -49,6 +49,7 @@ class DocxToMdConverter(object):
         self.pandoc = opts.get("pandoc", "/usr/local/bin/pandoc")
         self.wmf2svg = opts.get("wmf2svg", "/usr/local/java/wmf2svg-0.9.8.jar")
         self.verbose = opts.get("verbose", False)
+        self.debug = opts.get("debug", False)
         self.jsonpath = opts.get("jsonpath", None)
         self.imgfolder = opts.get("img_dir", None)
         self.html = opts.get("html", False)
@@ -97,7 +98,7 @@ class DocxToMdConverter(object):
         files_path = os.path.join(self.cwd, "files")
         new_env["PATH"] = new_env.get("PATH", "") + os.pathsep + files_path
 
-        if self.verbose: 
+        if self.debug: 
             print("Running: " + " ".join(args))
         p = subprocess.Popen(args, bufsize=4096, stdin=None, 
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=new_env, cwd=self.cwd)
@@ -163,9 +164,9 @@ class DocxToMdConverter(object):
 
         self.pandocRun(args)
 
-        if self.verbose: 
-            print(self.stderr)
-            print(self.stdout)
+        if self.debug: 
+            print("STDERR: %s" % self.stderr)
+            print("STDOUT: %s" % self.stdout)
         self.success = True
 
     def convertDocxToJson(self): 
@@ -225,7 +226,13 @@ class DocxToMdConverter(object):
             self.convertJsonToMd() 
         if self.success and self.html: 
             self.convertMdToHtml()
-
+        if not self.debug: 
+            try: 
+                os.remove(self.jsonpath)
+                os.remove(self.mediainfopath)
+                shutil.rmtree(self.mediafolder)
+            except: 
+                warnings.warn("Cannot clean up!")
 
 def parseOptions(): 
     parser = argparse.ArgumentParser(description=__doc__,
@@ -236,6 +243,7 @@ def parseOptions():
     parser.add_argument("-f", "--format", help="input format, default 'docx'", action="store", default='docx')
     parser.add_argument("-t", "--toc", help="generate TOC", action="store_true", default=False)
     parser.add_argument("-H", "--html", help="generate HTML from Markdown", action="store_true", default=False)
+    parser.add_argument("-D", "--debug", help="keep intermediate files", action="store_true", default=False)
     parser.add_argument("--pandoc", help="path to 'pandoc' executable", default="/usr/local/bin/pandoc")
     parser.add_argument("--wmf2svg", help="path to wmf2svg-n.n.n.jar", default="/usr/local/java/wmf2svg-0.9.8.jar")
     parser.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
@@ -244,6 +252,8 @@ def parseOptions():
 
 def main(): 
     opts = parseOptions()
+    if opts["debug"]: 
+        print("Running with options: %s" % opts)
     converter = DocxToMdConverter(**opts)
     converter.convertDocxToMd()
     if converter.success:
