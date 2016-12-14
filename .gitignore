@@ -1,5 +1,5 @@
 # Custom
-private/
+_private/
 
 *.DS_Store
 .AppleDouble
