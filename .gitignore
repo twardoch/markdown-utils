@@ -1,3 +1,6 @@
+# Custom
+private/
+
 *.DS_Store
 .AppleDouble
 .LSOverride
