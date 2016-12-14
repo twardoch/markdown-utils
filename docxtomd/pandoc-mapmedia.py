@@ -33,7 +33,7 @@ def pandoc_wmftosvgpng(key, value, fmt, meta):
         else:
             attrs, alt, [src, title] = value
 
-        mediainfopath = os.environ['pandoc_mediainfo']
+        mediainfopath = os.environ['pandoc-mapmedia']
         mediainfo = json.load(file(mediainfopath))
         srcfolder = mediainfo['srcfull']
         dstfolder = mediainfo['dstfull']

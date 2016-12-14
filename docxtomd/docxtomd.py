@@ -138,7 +138,7 @@ class DocxToMdConverter(object):
             "map": self.mediamap
         }, mediainfofile)
         mediainfofile.close()
-        os.environ['pandoc_mediainfo'] = self.mediainfopath
+        os.environ['pandoc-mapmedia'] = self.mediainfopath
 
     def convertJsonToMd(self): 
         pdArgs = ['--smart', '--section-divs', '--atx-headers']
