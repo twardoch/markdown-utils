@@ -1,5 +1,5 @@
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages
+from setuptools import setup
 # To use a consistent encoding
 from codecs import open
 from os import path
@@ -23,6 +23,7 @@ setup(
 
     # The project's main homepage.
     url='https://github.com/twardoch/markdown-utils',
+    download_url='https://github.com/twardoch/markdown-utils/archive/master.zip',
 
     # Author details
     author='Adam Twardoch',
@@ -53,11 +54,11 @@ setup(
     ],
 
     # What does your project relate to?
-    keywords='pandoc markdown word docx',
+    keywords=['Markdown', 'typesetting', 'pandoc', 'word', 'docx', 'wmf', 'svg'], 
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=find_packages(exclude=['_private', '__old', 'test']),
+    packages=['mdutils'],
 
     # List run-time dependencies here.  These will be installed by pip when
     # your project is installed. For an analysis of "install_requires" vs pip's
