@@ -49,5 +49,5 @@ fi
 
 # Install me
 echo "# Install 'mdutils'"
-pip install --user --upgrade .
+pip install --user --upgrade --process-dependency-links .
 echo "# Done!"

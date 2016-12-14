@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""docxtomd 0.3.2
+"""docxtomd
   Word .docx to Markdown converter
   Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
   https://github.com/twardoch/markdown-utils
@@ -12,6 +12,8 @@ or bitmap images contained in the .docx into either .svg or .png.
 example: 
   $ ./docxtomd.py --html -d test/test1 test/test1.docx
 """
+
+__version__ = "0.3.4"
 
 import os
 import warnings
@@ -262,8 +264,9 @@ def parseOptions():
     parser.add_argument("-H", "--html", help="generate HTML from Markdown", action="store_true", default=False)
     parser.add_argument("-D", "--debug", help="keep intermediate files", action="store_true", default=False)
     parser.add_argument("--pandoc", help="path to 'pandoc' executable", default="/usr/local/bin/pandoc")
-    parser.add_argument("--wmf2svg", help="path to wmf2svg.jar", default="/usr/local/java/wmf2svg.jar")
+    parser.add_argument("--wmf2svg", help="path to 'wmf2svg.jar'", default="/usr/local/java/wmf2svg.jar")
     parser.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
+    parser.add_argument('-V', '--version', action='version', version="%(prog)s ("+__version__+")")
     args = parser.parse_args()
     return vars(args)
 

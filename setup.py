@@ -16,7 +16,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.3.2',
+    version='0.3.4',
 
     description='Python package for working with Markdown. Includes `docxtomd`, a Word .docx to Markdown converted using `pandoc` and `wmf2svg`, and `wmftosvgpng`, an intelligent WMF to SVG or PNG converter using `wmf2svg`.',
     long_description=long_description,
@@ -64,13 +64,13 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['scour', 'pandocfilters', 
-        'markdown', 'pymdown-extensions', 'markdown-include', 'mdx_sections', 
-        'markdown-figures', 'markdown-wikilinks',
+    install_requires=['scour>=0.35', 'pandocfilters>=1.4.1', 
+        'Markdown>=2.6.7', 'pymdown-extensions>=1.2', 'markdown-include>=0.5.1', 'mdx_sections>=0.1', 
+        'markdown-figures>=0.0.3', 'markdown-wikilinks>=0.0.3',
         ],
     dependency_links = [
-     'https://github.com/twardoch/markdown-figures/tarball/master#egg=markdown-figures',
-     'https://github.com/twardoch/markdown-wikilinks/tarball/master#egg=markdown-wikilinks',
+     'git+https://github.com/twardoch/markdown-figures.git/@master#egg=markdown-figures-0.0.3',
+     'git+https://github.com/twardoch/markdown-wikilinks.git/@master#egg=markdown-wikilinks-0.0.3',
     ],
 
     # To provide executable scripts, use entry points in preference to the

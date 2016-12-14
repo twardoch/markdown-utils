@@ -37,7 +37,6 @@ def pandoc_wmftosvgpng(key, value, fmt, meta):
         mediainfo = json.load(file(mediainfopath))
         srcfolder = mediainfo['srcfull']
         dstfolder = mediainfo['dstfull']
-        prefix = mediainfo['prefix']
         srcsubstr = mediainfo['srcsubstr']
         dstsubstr = mediainfo['dstsubstr']
         mediamap = mediainfo['map']
@@ -46,10 +45,16 @@ def pandoc_wmftosvgpng(key, value, fmt, meta):
         srcfn = os.path.basename(src)
         mapfn = mediamap.get(srcfn, srcfn)
         dstfn = mapfn
+
+        dstbase, dstext = os.path.splitext(mapfn)
+        prefix = mediainfo['prefix']
+        newbase = dstbase[5:].zfill(4)
+        suffix = ""
         if alt: 
             if len(alt) > 0: 
-                dstfn = ExtractAlphanumeric(alt[0]['c']) + os.path.splitext(dstfn)[1]
-        dstfn = prefix + "_" + dstfn
+                suffix = "_" + ExtractAlphanumeric(alt[0]['c'])
+        dstfn = prefix + "_" + newbase + suffix + dstext
+
         newsrc = os.path.join(dstsubstr, dstfn)
         srcpath = os.path.join(srcfolder, mapfn)
         dstpath = os.path.join(dstfolder, dstfn)

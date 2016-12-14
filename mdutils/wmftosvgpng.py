@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""wmftosvgpng 0.3.0
+"""wmftosvgpng 
   WMF to SVG or PNG converter
   Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
   https://github.com/twardoch/markdown-utils
@@ -19,13 +19,15 @@ Usage in shell:
   ["png", "./bitmapout.png"]
 
 Usage in Python:
-  import wmftosvgpng
+  from mdutils import wmftosvgpng
   outputtype, outputpath = wmftosvgpng.toSvgOrPng(**{
       'inputpath': 'vectorin.wmf', 'outputbase': 'vectorout', 
       'compress': True, 'verbose': True, 'remove': True, 
       'wmf2svg': '/usr/local/java/wmf2svg.jar'
   })
 """
+
+__version__ = "0.3.4"
 
 import os
 import sys
@@ -123,7 +125,8 @@ def parseOptions():
     parser.add_argument("-c", "--compress", action="store_true", default=False, help="compress SVG")
     parser.add_argument("-r", "--remove", action="store_true", default=False, help="remove input.wmf after conversion")
     parser.add_argument("-v", "--verbose", action="store_true", default=False, help="report written file type and path")
-    parser.add_argument("--wmf2svg", help="path to wmf2svg.jar", default="/usr/local/java/wmf2svg.jar")
+    parser.add_argument("--wmf2svg", help="path to 'wmf2svg.jar'", default="/usr/local/java/wmf2svg.jar")
+    parser.add_argument('-V', '--version', action='version', version="%(prog)s ("+__version__+")")
     args = vars(parser.parse_args())
     if not args["outputbase"]: 
         args["outputbase"] = os.path.splitext(args["inputpath"])[0]

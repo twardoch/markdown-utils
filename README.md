@@ -19,7 +19,7 @@ On other systems, install the dependencies:
 
 Then run:
 ```
-pip install --user git+https://github.com/twardoch/markdown-utils.git
+pip install --user --process-dependency-links git+https://github.com/twardoch/markdown-utils.git
 ```
 
 ## docxtomd
@@ -43,17 +43,21 @@ The result is a more robust Markdown file with extracted media. Optionally, the 
 ### Usage
 
 ```
-usage: docxtomd.py [-h] [-d OUT_DIR] [-f FORMAT] [-t] [-H] [--pandoc PANDOC]
-                   [--wmf2svg WMF2SVG] [-v]
-                   inputpath [outputpath]
+usage: docxtomd [-h] [-d OUT_DIR] [-f FORMAT] [-t] [-H] [-D] [--pandoc PANDOC]
+                [--wmf2svg WMF2SVG] [-v] [-V]
+                inputpath [outputpath]
 
-docxtomd 0.2
-  DOCX to Markdown converter
+docxtomd
+  Word .docx to Markdown converter
   Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
   https://github.com/twardoch/markdown-utils
 
+This tool converts a Word .docx file to Markdown using pandoc.
+Unlike pandoc, it intelligently converts and names the vector
+or bitmap images contained in the .docx into either .svg or .png.
+
 example:
-  $ ./docxtomd.py -v -d test/test1 test/test1.docx
+  $ ./docxtomd.py --html -d test/test1 test/test1.docx
 
 positional arguments:
   inputpath             input.docx file
@@ -67,9 +71,11 @@ optional arguments:
                         input format, default 'docx'
   -t, --toc             generate TOC
   -H, --html            generate HTML from Markdown
+  -D, --debug           keep intermediate files
   --pandoc PANDOC       path to 'pandoc' executable
-  --wmf2svg WMF2SVG     path to wmf2svg-n.n.n.jar
+  --wmf2svg WMF2SVG     path to 'wmf2svg.jar'
   -v, --verbose         increase output verbosity
+  -V, --version         show program's version number and exit
 ```
 
 ## wmftosvgpng
@@ -92,8 +98,28 @@ pip install --user scour
 
 Usage in shell:
 ```
-usage: wmftosvgpng.py [-h] [-c] [-r] [-v] [--wmf2svg WMF2SVG]
-                      inputpath [outputbase]
+usage: wmftosvgpng [-h] [-c] [-r] [-v] [--wmf2svg WMF2SVG] [-V]
+                   inputpath [outputbase]
+
+wmftosvgpng
+  WMF to SVG or PNG converter
+  Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
+  https://github.com/twardoch/markdown-utils
+
+Usage in shell:
+  $ wmftosvgpng.py -v -c -o vectorout vectorin.wmf
+  ["svg", "./vectorout.svg"]
+  $ wmftosvgpng.py -v -c -o bitmapout bitmapin.wmf
+  ["png", "./bitmapout.png"]
+
+Usage in Python:
+  from mdutils import wmftosvgpng
+  outputtype, outputpath = wmftosvgpng.toSvgOrPng(**{
+      'inputpath': 'vectorin.wmf', 'outputbase': 'vectorout',
+      'compress': True, 'verbose': True, 'remove': True,
+      'wmf2svg': '/usr/local/java/wmf2svg.jar'
+  })
+
 positional arguments:
   inputpath          input.wmf file
   outputbase         output base filename, defaults to input[.svg|.png]
@@ -103,21 +129,6 @@ optional arguments:
   -c, --compress     compress SVG
   -r, --remove       remove input.wmf after conversion
   -v, --verbose      report written file type and path
-  --wmf2svg WMF2SVG  path to wmf2svg-n.n.n.jar
-
-examples:
-  $ wmftosvgpng.py -v -c -o vectorout vectorin.wmf
-  ["svg", "./vectorout.svg"]
-  $ wmftosvgpng.py -v -c -o bitmapout bitmapin.wmf
-  ["png", "./bitmapout.png"]
-```
-
-Usage in Python:
-```
-  import wmftosvgpng
-  outputtype, outputpath = wmftosvgpng.toSvgOrPng(**{
-      'inputpath': 'vectorin.wmf', 'outputbase': 'vectorout',
-      'compress': True, 'verbose': True, 'remove': True,
-      'wmf2svg': '/usr/local/java/wmf2svg-0.9.8.jar'
-  })
+  --wmf2svg WMF2SVG  path to 'wmf2svg.jar'
+  -V, --version      show program's version number and exit
 ```
