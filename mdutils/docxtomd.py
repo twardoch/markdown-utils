@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""docxtomd 0.3.0
+"""docxtomd 0.3.1
   Word .docx to Markdown converter
   Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
   https://github.com/twardoch/markdown-utils
@@ -145,7 +145,7 @@ class DocxToMdConverter(object):
         if self.toc: 
             pdArgs.append('--toc')
 
-        pdFilters = ['./pandoc_mapmedia.py']
+        pdFilters = [os.path.join(os.path.dirname(__file__),'pandoc_mapmedia.py')]
 
         pdMdExt = ['-pipe_tables', '+auto_identifiers', '+backtick_code_blocks', '+blank_before_blockquote', '+blank_before_header', '+bracketed_spans', '+definition_lists', '+escaped_line_breaks', '+fenced_code_attributes', '+footnotes', '+grid_tables', '+header_attributes', '+implicit_header_references', '+line_blocks', '+pandoc_title_block']
         pdMdOutFmt = 'markdown_github' + ''.join(pdMdExt)
@@ -192,7 +192,10 @@ class DocxToMdConverter(object):
             self.mediafolder = os.path.join(self.outfolder, "media")
             if os.path.exists(self.mediafolder): 
                 shutil.rmtree(self.mediafolder)
-            shutil.move(os.path.join(self.cwd, "media"), self.outfolder)
+            if os.path.exists(os.path.join(self.cwd, "media")): 
+                shutil.move(os.path.join(self.cwd, "media"), self.outfolder)
+            else: 
+                os.makedirs(os.path.join(self.outfolder, "media"))
             self.mediafolder = os.path.join(self.outfolder, "media")
         self.success = True
 
