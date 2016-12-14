@@ -43,8 +43,8 @@ The result is a more robust Markdown file with extracted media. Optionally, the 
 ### Usage
 
 ```
-usage: docxtomd [-h] [-d OUT_DIR] [-f FORMAT] [-t] [-H] [-D] [--pandoc PANDOC]
-                [--wmf2svg WMF2SVG] [-v] [-V]
+usage: docxtomd [-h] [-d OUT_DIR] [-f FORMAT] [-t] [-k] [-H] [-D]
+                [--pandoc PANDOC] [--wmf2svg WMF2SVG] [-v] [-V]
                 inputpath [outputpath]
 
 docxtomd
@@ -70,6 +70,8 @@ optional arguments:
   -f FORMAT, --format FORMAT
                         input format, default 'docx'
   -t, --toc             generate TOC
+  -k, --keep-dimensions
+                        write image height and width into .md
   -H, --html            generate HTML from Markdown
   -D, --debug           keep intermediate files
   --pandoc PANDOC       path to 'pandoc' executable

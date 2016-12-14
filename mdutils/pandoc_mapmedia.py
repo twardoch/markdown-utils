@@ -7,7 +7,7 @@ Pandoc filter to aid conversion of WMF files to SVG or PNG.
   https://github.com/twardoch/markdown-utils
 """
 
-__version__ = "0.3.5"
+__version__ = "0.4.0"
 
 import os
 import sys
@@ -35,13 +35,14 @@ def pandoc_wmftosvgpng(key, value, fmt, meta):
         else:
             attrs, alt, [src, title] = value
 
-        mediainfopath = os.environ['pandoc_mapmedia']
+        mediainfopath = os.environ['pandoc_mapmedia_info']
         mediainfo = json.load(file(mediainfopath))
         srcfolder = mediainfo['srcfull']
         dstfolder = mediainfo['dstfull']
         srcsubstr = mediainfo['srcsubstr']
         dstsubstr = mediainfo['dstsubstr']
         mediamap = mediainfo['map']
+        keepdim = mediainfo.get('keepdim', False)
 
         newsrc = src
         srcfn = os.path.basename(src)
@@ -51,6 +52,7 @@ def pandoc_wmftosvgpng(key, value, fmt, meta):
         dstbase, dstext = os.path.splitext(mapfn)
         prefix = mediainfo['prefix']
         newbase = dstbase[5:].zfill(4)
+
         suffix = ""
         if alt: 
             if len(alt) > 0: 
@@ -61,18 +63,23 @@ def pandoc_wmftosvgpng(key, value, fmt, meta):
                     elif e[u't'] == u'Space': 
                         s += u' '
 
-                s = ExtractAlphanumeric(s.encode('ascii', 'ignore'))[-20:]
+                s = ExtractAlphanumeric(s.encode('ascii', 'ignore'))[-30:]
+                alt = [{u'c': unicode(s), u't': u'Str'}]
                 suffix = "_" + s
-        dstfn = prefix + "_" + newbase + suffix + dstext
 
+        dstfn = prefix + "_" + newbase + suffix + dstext
         newsrc = os.path.join(dstsubstr, dstfn)
         srcpath = os.path.join(srcfolder, mapfn)
         dstpath = os.path.join(dstfolder, dstfn)
+
         if os.path.exists(dstpath): 
             os.remove(dstpath)
         shutil.copyfile(srcpath, dstpath)
 
         src = unicode(newsrc)
+
+        if attrs and not keepdim: 
+            attrs[2] = [] # Remove image dimensions
 
         if attrs:
             return Image(attrs, alt, [src, title])

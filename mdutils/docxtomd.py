@@ -13,7 +13,7 @@ example:
   $ ./docxtomd.py --html -d test/test1 test/test1.docx
 """
 
-__version__ = "0.3.5"
+__version__ = "0.4.0"
 
 import os
 import warnings
@@ -52,6 +52,7 @@ class DocxToMdConverter(object):
         self.jsonpath = opts.get("jsonpath", None)
         self.imgfolder = opts.get("img_dir", None)
         self.html = opts.get("html", False)
+        self.keepdim = opts.get("keep_dimensions", False)
         self.success = True
         self.stdout = None
         self.stderr = None
@@ -132,6 +133,7 @@ class DocxToMdConverter(object):
         self.mediainfopath = os.path.join(self.outfolder, self.mediaprefix + ".media.json")
         mediainfofile = file(self.mediainfopath, "w")
         json.dump({
+            "keepdim": self.keepdim, 
             "srcfull": self.mediafolder, 
             "dstfull": self.imgfolder,
             "prefix": self.mediaprefix, 
@@ -140,7 +142,7 @@ class DocxToMdConverter(object):
             "map": self.mediamap
         }, mediainfofile)
         mediainfofile.close()
-        os.environ['pandoc_mapmedia'] = self.mediainfopath
+        os.environ['pandoc_mapmedia_info'] = self.mediainfopath
 
     def convertJsonToMd(self): 
         pdArgs = ['--smart', '--section-divs', '--atx-headers']
@@ -261,6 +263,7 @@ def parseOptions():
     parser.add_argument("-d", "--out-dir", help="output folder, default to current", action="store", default=None)
     parser.add_argument("-f", "--format", help="input format, default 'docx'", action="store", default='docx')
     parser.add_argument("-t", "--toc", help="generate TOC", action="store_true", default=False)
+    parser.add_argument("-k", "--keep-dimensions", help="write image height and width into .md", action="store_true", default=False)
     parser.add_argument("-H", "--html", help="generate HTML from Markdown", action="store_true", default=False)
     parser.add_argument("-D", "--debug", help="keep intermediate files", action="store_true", default=False)
     parser.add_argument("--pandoc", help="path to 'pandoc' executable", default="/usr/local/bin/pandoc")
