@@ -1,0 +1,1 @@
+{"map": {"image1.png": "image1.png", "image2.wmf": "image2.svg"}, "prefix": "test1", "srcfull": "/Users/adam/Developer/vcs/github/twardoch/markdown-utils/docxtomd/test/test1/media", "dstfull": "/Users/adam/Developer/vcs/github/twardoch/markdown-utils/docxtomd/test/test1/img", "srcsubstr": "./media/", "dstsubstr": "img/"}

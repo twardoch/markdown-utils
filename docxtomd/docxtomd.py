@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""docxtomd 0.1
+"""docxtomd 0.2
   DOCX to Markdown converter
   Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
   https://github.com/twardoch/markdown-utils
@@ -24,6 +24,19 @@ import sh
 import argparse
 import subprocess
 import shutil
+import fnmatch
+import string
+import json
+import wmftosvgpng
+import codecs
+try: 
+    import markdown
+    MARKDOWN = True
+except ImportError: 
+    MARKDOWN = False
+
+def ExtractAlphanumeric(InputString):
+    return "".join([ch for ch in InputString if ch in (string.ascii_letters + string.digits)])
 
 class DocxToMdConverter(object): 
 
@@ -34,12 +47,16 @@ class DocxToMdConverter(object):
         self.format = opts.get("format", "docx")
         self.toc = opts.get("toc", False)
         self.pandoc = opts.get("pandoc", "/usr/local/bin/pandoc")
+        self.wmf2svg = opts.get("wmf2svg", "/usr/local/java/wmf2svg-0.9.8.jar")
         self.verbose = opts.get("verbose", False)
         self.jsonpath = opts.get("jsonpath", None)
         self.imgfolder = opts.get("img_dir", None)
+        self.html = opts.get("html", False)
         self.success = True
         self.stdout = None
         self.stderr = None
+        self.mediafolder = self.imgfolder
+        self.cwd = os.path.dirname(os.path.realpath(os.getcwd()))
 
     def preparePaths(self): 
         if not self.inputpath: 
@@ -52,17 +69,15 @@ class DocxToMdConverter(object):
         self.outputpath = os.path.realpath(os.path.normpath(self.outputpath))
         if self.outfolder: 
             self.outfolder = os.path.realpath(os.path.normpath(self.outfolder))
-            self.outputpath = os.path.join(self.outfolder, os.path.split(self.outputpath)[1])
+            self.outputpath = os.path.join(self.outfolder, os.path.basename(self.outputpath))
         else: 
-            self.outfolder = os.path.split(self.outputpath)[0]
+            self.outfolder = os.path.dirname(self.outputpath)
         if not os.path.exists(self.outfolder): 
             try: 
                 os.makedirs(self.outfolder)
             except: 
                 warnings.warn("Cannot create folder %s" % (self.outfolder))
                 self.success = False
-        if not self.jsonpath: 
-            self.jsonpath = self.outputpath + "-tmp.json"
         if not self.imgfolder: 
             self.imgfolder = os.path.join(self.outfolder, "img")
         if not os.path.exists(self.imgfolder): 
@@ -71,19 +86,21 @@ class DocxToMdConverter(object):
             except: 
                 warnings.warn("Cannot create folder %s" % (self.imgfolder))
                 self.success = False
+        self.mediaprefix = ExtractAlphanumeric(os.path.splitext(os.path.basename(self.outputpath))[0])
+        if not self.jsonpath: 
+            self.jsonpath = os.path.join(self.outfolder, self.mediaprefix + ".doc.json")
 
     def pandocRun(self, args): 
         # To get access to pandoc-citeproc when we use a included copy of pandoc,
         # we need to add the pypandoc/files dir to the PATH
         new_env = os.environ.copy()
-        cwd = os.path.dirname(os.path.realpath(__file__))
-        files_path = os.path.join(cwd, "files")
+        files_path = os.path.join(self.cwd, "files")
         new_env["PATH"] = new_env.get("PATH", "") + os.pathsep + files_path
 
         if self.verbose: 
             print("Running: " + " ".join(args))
         p = subprocess.Popen(args, bufsize=4096, stdin=None, 
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=new_env, cwd=cwd)
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=new_env, cwd=self.cwd)
         if not (p.returncode is None):
             raise RuntimeError(
                 'Pandoc died with exitcode "%s" before receiving input: %s' % (p.returncode,
@@ -97,10 +114,39 @@ class DocxToMdConverter(object):
             self.success = False
         assert self.stdout == ""
 
+    def prepareMedia(self): 
+        self.mediamap = {}
+        for pngfn in fnmatch.filter(os.listdir(self.mediafolder), '*.png'): 
+            self.mediamap[pngfn] = pngfn
+        for wmffn in fnmatch.filter(os.listdir(self.mediafolder), '*.wmf'): 
+            fullsrc = os.path.join(self.mediafolder, wmffn)
+            fulloutbase = os.path.splitext(fullsrc)[0]
+            rettype, retpath = wmftosvgpng.toSvgOrPng(**{
+                'inputpath': fullsrc, 'outputbase': fulloutbase, 
+                'compress': False, 'verbose': False, 'remove': True, 
+                'wmf2svg': self.wmf2svg
+            })
+            if rettype: 
+                retfn = os.path.basename(retpath)
+                self.mediamap[wmffn] = retfn
+        self.mediainfopath = os.path.join(self.outfolder, self.mediaprefix + ".media.json")
+        mediainfofile = file(self.mediainfopath, "w")
+        json.dump({
+            "srcfull": self.mediafolder, 
+            "dstfull": self.imgfolder,
+            "prefix": self.mediaprefix, 
+            "srcsubstr": u"./media/", 
+            "dstsubstr": u"img/", 
+            "map": self.mediamap
+        }, mediainfofile)
+        mediainfofile.close()
+        os.environ['pandoc_mediainfo'] = self.mediainfopath
+
     def convertJsonToMd(self): 
         pdArgs = ['--smart', '--section-divs', '--atx-headers']
-        pdFilters = ['./pandoc-wmftosvgpng.py']
-        os.environ['pandoc_wmftosvgpng'] = self.outfolder
+        if self.toc: 
+            pdArgs.append('--toc')
+        pdFilters = ['./pandoc-mapmedia.py']
 
         pdMdExt = ['-pipe_tables', '+auto_identifiers', '+backtick_code_blocks', '+blank_before_blockquote', '+blank_before_header', '+bracketed_spans', '+definition_lists', '+escaped_line_breaks', '+fenced_code_attributes', '+footnotes', '+grid_tables', '+header_attributes', '+implicit_header_references', '+line_blocks', '+pandoc_title_block']
         pdMdOutFmt = 'markdown_github' + ''.join(pdMdExt)
@@ -144,11 +190,28 @@ class DocxToMdConverter(object):
         self.pandocRun(args)
 
         if self.format == "docx": 
-            mediafolder = os.path.join(self.outfolder, "media")
-            if os.path.exists(mediafolder): 
-                shutil.rmtree(mediafolder)
-            shutil.move("media", self.outfolder)
+            self.mediafolder = os.path.join(self.outfolder, "media")
+            if os.path.exists(self.mediafolder): 
+                shutil.rmtree(self.mediafolder)
+            shutil.move(os.path.join(self.cwd, "media"), self.outfolder)
+            self.mediafolder = os.path.join(self.outfolder, "media")
         self.success = True
+
+    def convertMdToHtml(self): 
+        if not MARKDOWN: 
+            warnings.warn("Install: pip install --user Markdown")
+        else: 
+            try: 
+                mdfile = codecs.open(self.outputpath, mode="r", encoding="utf-8")
+                md = mdfile.read()
+                html = markdown.markdown(md)
+                htmlfile = codecs.open(os.path.splitext(self.outputpath)[0] + ".html", 
+                    "w", encoding="utf-8", errors="xmlcharrefreplace")
+                htmlfile.write(html)
+                htmlfile.close()
+                self.success = True
+            except: 
+                self.success = False
 
     def convertDocxToMd(self): 
         # For various reasons, we run pandoc twice: 
@@ -157,7 +220,12 @@ class DocxToMdConverter(object):
         if self.success: 
             self.convertDocxToJson()
         if self.success: 
+            self.prepareMedia()
+        if self.success: 
             self.convertJsonToMd() 
+        if self.success and self.html: 
+            self.convertMdToHtml()
+
 
 def parseOptions(): 
     parser = argparse.ArgumentParser(description=__doc__,
@@ -167,7 +235,9 @@ def parseOptions():
     parser.add_argument("-d", "--out-dir", help="output folder, default to current", action="store", default=None)
     parser.add_argument("-f", "--format", help="input format, default 'docx'", action="store", default='docx')
     parser.add_argument("-t", "--toc", help="generate TOC", action="store_true", default=False)
+    parser.add_argument("-H", "--html", help="generate HTML from Markdown", action="store_true", default=False)
     parser.add_argument("--pandoc", help="path to 'pandoc' executable", default="/usr/local/bin/pandoc")
+    parser.add_argument("--wmf2svg", help="path to wmf2svg-n.n.n.jar", default="/usr/local/java/wmf2svg-0.9.8.jar")
     parser.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
     args = parser.parse_args()
     return vars(args)

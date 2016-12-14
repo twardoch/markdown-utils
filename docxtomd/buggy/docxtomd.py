@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""docxtomd 0.2
+"""docxtomd 0.1
   DOCX to Markdown converter
   Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
   https://github.com/twardoch/markdown-utils
@@ -24,7 +24,6 @@ import sh
 import argparse
 import subprocess
 import shutil
-import fnmatch
 
 class DocxToMdConverter(object): 
 
@@ -41,7 +40,6 @@ class DocxToMdConverter(object):
         self.success = True
         self.stdout = None
         self.stderr = None
-        self.mediafolder = self.imgfolder
 
     def preparePaths(self): 
         if not self.inputpath: 
@@ -99,13 +97,9 @@ class DocxToMdConverter(object):
             self.success = False
         assert self.stdout == ""
 
-    def convertWmfToSvgPng(self): 
-        wmffiles = fnmatch.filter(os.listdir(self.mediafolder), '*.wmf')
-        print(wmffiles)
-
     def convertJsonToMd(self): 
         pdArgs = ['--smart', '--section-divs', '--atx-headers']
-        pdFilters = ['./pandoc-wmftosvgpng-alt.py']
+        pdFilters = ['./pandoc-wmftosvgpng.py']
         os.environ['pandoc_wmftosvgpng'] = self.outfolder
 
         pdMdExt = ['-pipe_tables', '+auto_identifiers', '+backtick_code_blocks', '+blank_before_blockquote', '+blank_before_header', '+bracketed_spans', '+definition_lists', '+escaped_line_breaks', '+fenced_code_attributes', '+footnotes', '+grid_tables', '+header_attributes', '+implicit_header_references', '+line_blocks', '+pandoc_title_block']
@@ -150,11 +144,10 @@ class DocxToMdConverter(object):
         self.pandocRun(args)
 
         if self.format == "docx": 
-            self.mediafolder = os.path.join(self.outfolder, "media")
-            if os.path.exists(self.mediafolder): 
-                shutil.rmtree(self.mediafolder)
+            mediafolder = os.path.join(self.outfolder, "media")
+            if os.path.exists(mediafolder): 
+                shutil.rmtree(mediafolder)
             shutil.move("media", self.outfolder)
-            self.mediafolder = os.path.join(self.outfolder, "media")
         self.success = True
 
     def convertDocxToMd(self): 
@@ -163,8 +156,6 @@ class DocxToMdConverter(object):
         self.preparePaths()
         if self.success: 
             self.convertDocxToJson()
-        if self.success: 
-            self.convertWmfToSvgPng()
         if self.success: 
             self.convertJsonToMd() 
 
