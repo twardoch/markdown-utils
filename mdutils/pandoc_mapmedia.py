@@ -7,6 +7,8 @@ Pandoc filter to aid conversion of WMF files to SVG or PNG.
   https://github.com/twardoch/markdown-utils
 """
 
+__version__ = "0.3.5"
+
 import os
 import sys
 import subprocess
@@ -52,7 +54,15 @@ def pandoc_wmftosvgpng(key, value, fmt, meta):
         suffix = ""
         if alt: 
             if len(alt) > 0: 
-                suffix = "_" + ExtractAlphanumeric(alt[0]['c'])
+                s = u''
+                for e in alt: 
+                    if e[u't'] == u'Str': 
+                        s += e[u'c']
+                    elif e[u't'] == u'Space': 
+                        s += u' '
+
+                s = ExtractAlphanumeric(s.encode('ascii', 'ignore'))[-20:]
+                suffix = "_" + s
         dstfn = prefix + "_" + newbase + suffix + dstext
 
         newsrc = os.path.join(dstsubstr, dstfn)
