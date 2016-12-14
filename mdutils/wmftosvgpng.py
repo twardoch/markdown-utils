@@ -20,7 +20,7 @@ Usage in Python:
   })
 """
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 
 import os
 import sys
@@ -47,7 +47,18 @@ def getPngOrSvg(svg):
     try: 
         doc = xml.dom.minidom.parseString(svg)
         root = doc.documentElement
-        if len(root.getElementsByTagName("image")) == 1 and len(root.getElementsByTagName("polygon")) + len(root.getElementsByTagName("path")) + len(root.getElementsByTagName("polyline")) == 0: 
+        isPng = False
+        if len(root.getElementsByTagName("polygon")) + len(root.getElementsByTagName("path")) + len(root.getElementsByTagName("polyline")) == 0: 
+            images = root.getElementsByTagName("image")
+            if len(images) == 1: 
+                isPng = True
+            elif len(images) > 0: 
+                isPng = True
+                for ei, e1 in enumerate(images[1:]): 
+                    e0 = images[ei - 1]
+                    if e0.toxml() != e1.toxml(): 
+                        isPng = False
+        if isPng: 
             png64 = root.getElementsByTagName("image")[0].getAttribute("xlink:href")
             png = base64.decodestring(png64[22:])
             return True, png
@@ -126,7 +137,7 @@ def parseOptions():
     return args
 
 def main(): 
-    return toSvgOrPng(**parseOptions())
+    toSvgOrPng(**parseOptions())
 
 if __name__ == '__main__':
     main()

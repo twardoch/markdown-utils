@@ -117,6 +117,7 @@ class DocxToMdConverter(object):
 
     def prepareMedia(self): 
         self.mediamap = {}
+
         for pngfn in fnmatch.filter(os.listdir(self.mediafolder), '*.png'): 
             self.mediamap[pngfn] = pngfn
         for wmffn in fnmatch.filter(os.listdir(self.mediafolder), '*.wmf'): 
@@ -124,8 +125,8 @@ class DocxToMdConverter(object):
             fulloutbase = os.path.splitext(fullsrc)[0]
             rettype, retpath = wmftosvgpng.toSvgOrPng(**{
                 'inputpath': fullsrc, 'outputbase': fulloutbase, 
-                'compress': False, 'verbose': False, 'remove': True, 
-                'wmf2svg': self.wmf2svg
+                'compress': False, 'verbose': False, 'remove': not self.debug, 
+                'wmf2svg': self.wmf2svg,
             })
             if rettype: 
                 retfn = os.path.basename(retpath)
