@@ -1,11 +1,11 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
-Pandoc filter to convert WMF files to SVG or PNG.
-Inspired by: 
-https://gist.github.com/jeromerobert/3996eca3acd12e4c3d40
-"""
+Pandoc filter to aid conversion of WMF files to SVG or PNG.
 
-__author__ = "Adam Twardoch"
+  Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
+  https://github.com/twardoch/markdown-utils
+"""
 
 import os
 import sys
@@ -33,7 +33,7 @@ def pandoc_wmftosvgpng(key, value, fmt, meta):
         else:
             attrs, alt, [src, title] = value
 
-        mediainfopath = os.environ['pandoc-mapmedia']
+        mediainfopath = os.environ['pandoc_mapmedia']
         mediainfo = json.load(file(mediainfopath))
         srcfolder = mediainfo['srcfull']
         dstfolder = mediainfo['dstfull']

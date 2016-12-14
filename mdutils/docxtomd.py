@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""docxtomd 0.3
+"""docxtomd 0.3.0
   Word .docx to Markdown converter
   Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
   https://github.com/twardoch/markdown-utils
@@ -44,7 +44,7 @@ class DocxToMdConverter(object):
         self.format = opts.get("format", "docx")
         self.toc = opts.get("toc", False)
         self.pandoc = opts.get("pandoc", "/usr/local/bin/pandoc")
-        self.wmf2svg = opts.get("wmf2svg", "/usr/local/java/wmf2svg-0.9.8.jar")
+        self.wmf2svg = opts.get("wmf2svg", "/usr/local/java/wmf2svg.jar")
         self.verbose = opts.get("verbose", False)
         self.debug = opts.get("debug", False)
         self.jsonpath = opts.get("jsonpath", None)
@@ -138,13 +138,14 @@ class DocxToMdConverter(object):
             "map": self.mediamap
         }, mediainfofile)
         mediainfofile.close()
-        os.environ['pandoc-mapmedia'] = self.mediainfopath
+        os.environ['pandoc_mapmedia'] = self.mediainfopath
 
     def convertJsonToMd(self): 
         pdArgs = ['--smart', '--section-divs', '--atx-headers']
         if self.toc: 
             pdArgs.append('--toc')
-        pdFilters = ['./pandoc-mapmedia.py']
+
+        pdFilters = ['./pandoc_mapmedia.py']
 
         pdMdExt = ['-pipe_tables', '+auto_identifiers', '+backtick_code_blocks', '+blank_before_blockquote', '+blank_before_header', '+bracketed_spans', '+definition_lists', '+escaped_line_breaks', '+fenced_code_attributes', '+footnotes', '+grid_tables', '+header_attributes', '+implicit_header_references', '+line_blocks', '+pandoc_title_block']
         pdMdOutFmt = 'markdown_github' + ''.join(pdMdExt)
@@ -242,7 +243,7 @@ def parseOptions():
     parser.add_argument("-H", "--html", help="generate HTML from Markdown", action="store_true", default=False)
     parser.add_argument("-D", "--debug", help="keep intermediate files", action="store_true", default=False)
     parser.add_argument("--pandoc", help="path to 'pandoc' executable", default="/usr/local/bin/pandoc")
-    parser.add_argument("--wmf2svg", help="path to wmf2svg-n.n.n.jar", default="/usr/local/java/wmf2svg-0.9.8.jar")
+    parser.add_argument("--wmf2svg", help="path to wmf2svg.jar", default="/usr/local/java/wmf2svg.jar")
     parser.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
     args = parser.parse_args()
     return vars(args)

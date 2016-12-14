@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""wmftosvgpng 0.1
+"""wmftosvgpng 0.3.0
   WMF to SVG or PNG converter
   Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
   https://github.com/twardoch/markdown-utils
 
 Requires: 
   Java wmf2svg: https://github.com/hidekatsu-izuno/wmf2svg 
-      build with 'ant', unzip, move wmf2svg-0.9.8.jar to /usr/local/java
+      build with `ant`, unzip, move `wmf2svg-0.9.8.jar` to 
+      `/usr/local/java/wmf2svg.jar`
   (optional) scour: https://github.com/scour-project/scour/
       pip install --user scour
 
@@ -22,7 +23,7 @@ Usage in Python:
   outputtype, outputpath = wmftosvgpng.toSvgOrPng(**{
       'inputpath': 'vectorin.wmf', 'outputbase': 'vectorout', 
       'compress': True, 'verbose': True, 'remove': True, 
-      'wmf2svg': '/usr/local/java/wmf2svg-0.9.8.jar'
+      'wmf2svg': '/usr/local/java/wmf2svg.jar'
   })
 """
 
@@ -122,7 +123,7 @@ def parseOptions():
     parser.add_argument("-c", "--compress", action="store_true", default=False, help="compress SVG")
     parser.add_argument("-r", "--remove", action="store_true", default=False, help="remove input.wmf after conversion")
     parser.add_argument("-v", "--verbose", action="store_true", default=False, help="report written file type and path")
-    parser.add_argument("--wmf2svg", help="path to wmf2svg-n.n.n.jar", default="/usr/local/java/wmf2svg-0.9.8.jar")
+    parser.add_argument("--wmf2svg", help="path to wmf2svg.jar", default="/usr/local/java/wmf2svg.jar")
     args = vars(parser.parse_args())
     if not args["outputbase"]: 
         args["outputbase"] = os.path.splitext(args["inputpath"])[0]
