@@ -1,19 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""docxtomd 0.2
-  DOCX to Markdown converter
+"""docxtomd 0.3
+  Word .docx to Markdown converter
   Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
   https://github.com/twardoch/markdown-utils
 
-Pandoc converts `.docx` to `.md` well but only extracts 
-media which can be `.png` or `.wmf`, and links them inside the 
-`.md` file. This tool converts the `.docx` to `.json`, 
-then from `.json` to `.md`. The second step also intelligently 
-converts `.wmf` into either `.svg` or `.png`. 
-The result is a more robust Markdown file with extracted media. 
+This tool converts a Word .docx file to Markdown using pandoc. 
+Unlike pandoc, it intelligently converts and names the vector 
+or bitmap images contained in the .docx into either .svg or .png. 
 
 example: 
-  $ ./docxtomd.py -v -d test/test1 test/test1.docx
+  $ ./docxtomd.py --html -d test/test1 test/test1.docx
 """
 
 import os

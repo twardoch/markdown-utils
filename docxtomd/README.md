@@ -15,9 +15,9 @@ This implementation performs three steps:
 
 1. Convert the `.docx` to `.doc.json` using Pandoc, extracting media.
 2. Calls the `wmftosvgpng` tool on all extracted media. This tool uses a Java tool [`wmf2svg`](https://github.com/hidekatsu-izuno/wmf2svg) to convert `.wmf` into `.svg`, then parses the `.svg` and if the `.svg` only contains one embedded PNG bitmap, saves it as a plain `.png`. This also produces a `.media.json` file which contains some mapping between the old and the new files.
-2. Convert from `.doc.json` to `.md` using Pandoc, calling the `pandoc-mapmedia.py` Pandoc filter, which remaps the path references to the media files and renames those which have the `alt` attribute available. It also copies the new media files from the `media/` subfolder into the `img/` subfolder.
+3. Convert from `.doc.json` to `.md` using Pandoc, calling the `pandoc-mapmedia.py` Pandoc filter, which (aided by `.media.json`) remaps the path references to the media files and renames those which have the `alt` attribute available. It also copies the new media files from the `media/` subfolder into the `img/` subfolder.
 
-The result is a more robust Markdown file with extracted media.
+The result is a more robust Markdown file with extracted media. Optionally, the tool can also generate `.html` from the `.md` using the Python `Markdown` module.
 
 ### Usage
 
@@ -30,13 +30,6 @@ docxtomd 0.2
   DOCX to Markdown converter
   Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
   https://github.com/twardoch/markdown-utils
-
-Pandoc converts `.docx` to `.md` well but only extracts
-media which can be `.png` or `.wmf`, and links them inside the
-`.md` file. This tool converts the `.docx` to `.json`,
-then from `.json` to `.md`. The second step also intelligently
-converts `.wmf` into either `.svg` or `.png`.
-The result is a more robust Markdown file with extracted media.
 
 example:
   $ ./docxtomd.py -v -d test/test1 test/test1.docx
