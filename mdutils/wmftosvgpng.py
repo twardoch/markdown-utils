@@ -5,13 +5,6 @@
   Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
   https://github.com/twardoch/markdown-utils
 
-Requires: 
-  Java wmf2svg: https://github.com/hidekatsu-izuno/wmf2svg 
-      build with `ant`, unzip, move `wmf2svg-0.9.8.jar` to 
-      `/usr/local/java/wmf2svg.jar`
-  (optional) scour: https://github.com/scour-project/scour/
-      pip install --user scour
-
 Usage in shell: 
   $ wmftosvgpng.py -v -c -o vectorout vectorin.wmf
   ["svg", "./vectorout.svg"]
