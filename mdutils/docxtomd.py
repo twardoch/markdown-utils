@@ -13,7 +13,7 @@ example:
   $ ./docxtomd.py --html -d test/test1 test/test1.docx
 """
 
-__version__ = "0.4.0"
+__version__ = "0.4.2"
 
 import os
 import warnings

@@ -7,7 +7,7 @@ Pandoc filter to aid conversion of WMF files to SVG or PNG.
   https://github.com/twardoch/markdown-utils
 """
 
-__version__ = "0.4.0"
+__version__ = "0.4.2"
 
 import os
 import sys
@@ -26,7 +26,7 @@ def pprint(s):
 def ExtractAlphanumeric(InputString):
     return "".join([ch for ch in InputString if ch in (string.ascii_letters + string.digits)])
 
-def pandoc_wmftosvgpng(key, value, fmt, meta):
+def pandoc_wmftosvgpng(key, value, format, meta):
     if key == 'Image':
         if len(value) == 2:
             # before pandoc 1.16
@@ -54,20 +54,27 @@ def pandoc_wmftosvgpng(key, value, fmt, meta):
         newbase = dstbase[5:].zfill(4)
 
         suffix = ""
+        altstr = ""
         if alt: 
             if len(alt) > 0: 
-                s = u''
                 for e in alt: 
                     if e[u't'] == u'Str': 
-                        s += e[u'c']
+                        altstr += e[u'c'].encode('ascii', 'ignore')
                     elif e[u't'] == u'Space': 
-                        s += u' '
-
-                s = ExtractAlphanumeric(s.encode('ascii', 'ignore'))[-30:]
-                alt = [{u'c': unicode(s), u't': u'Str'}]
-                suffix = "_" + s
+                        altstr += ' '
+                altstr = ExtractAlphanumeric(altstr)[-30:]
+                suffix = "_" + altstr
 
         dstfn = prefix + "_" + newbase + suffix + dstext
+
+        if altstr:
+            altstr = prefix + "_" + altstr
+        else: 
+            altstr = prefix + "_" + newbase
+        alt = [{u'c': unicode(altstr), u't': u'Str'}]
+        if not title: 
+            title = unicode(altstr)
+
         newsrc = os.path.join(dstsubstr, dstfn)
         srcpath = os.path.join(srcfolder, mapfn)
         dstpath = os.path.join(dstfolder, dstfn)
