@@ -8,6 +8,7 @@ import argparse
 import os
 import re
 
+
 # Main function
 def main(args):
     docname = args.get("inpath", None)
@@ -24,6 +25,7 @@ def main(args):
     links = {}
     textlines = extract_links(maintext, links)
     split_file(file_dir, textlines, make_groups, levels, links)
+
 
 # Extract all end of page links and footnotes, and store them in dict for
 # lookup
@@ -74,7 +76,7 @@ def split_file(file_dir, textlines, make_groups, levels, links):
         if re.match('#{1,' + levels + '}[^#]', line):
             if len(section) > 0:
                 ml = ("index",)
-                if m2: 
+                if m2:
                     ml = m2.groups()
                 elif m:
                     ml = m.groups()
@@ -117,6 +119,7 @@ def check_links(text, links):
         return text + '\n' + '\n'.join(linkline)
     else:
         return text
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

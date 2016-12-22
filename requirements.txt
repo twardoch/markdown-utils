@@ -1,8 +1,8 @@
+sh>=1.11
 Markdown>=2.6.7
 pandocfilters>=1.4.1
 scour>=0.35
 pymdown-extensions>=1.2
 markdown-include>=0.5.1
 mdx_sections>=0.1
-git+https://github.com/twardoch/markdown-figures.git
-git+https://github.com/twardoch/markdown-wikilinks.git
+git+https://github.com/twardoch/markdown-steroids.git/@master#egg=mdx_steroids-0.4.0

@@ -1,0 +1,1 @@
+{"map": {"image1.png": "image1.png", "image2.wmf": "image2.svg"}, "prefix": "test1", "srcsubstr": "./media/", "srcfull": "/Users/adam/Developer/vcs/github/twardoch/markdown-utils/mdutils/test/test1nodims/media", "dstfull": "/Users/adam/Developer/vcs/github/twardoch/markdown-utils/mdutils/test/test1nodims/img", "keepdim": false, "dstsubstr": "img/"}
