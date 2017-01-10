@@ -14,6 +14,7 @@ On Mac OS X, install [Homebrew](http://brew.sh/) and then in Terminal run:
 ```
 
 On other systems, install the dependencies:
+
 * [pandoc](http://pandoc.org/)
 * [wmf2svg](https://github.com/hidekatsu-izuno/wmf2svg) — build with 'ant'
 
