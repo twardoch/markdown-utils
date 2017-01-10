@@ -37,7 +37,7 @@ except ImportError:
     MARKDOWN = False
 
 
-def ExtractAlphanumeric(InputString):
+def extractAlphanumeric(InputString):
     return "".join([ch for ch in InputString if ch in (string.ascii_letters + string.digits)])
 
 
@@ -95,7 +95,7 @@ class DocxToMdConverter(object):
             except:
                 warnings.warn("Cannot create folder %s" % (self.imgfolder))
                 self.success = False
-        self.mediaprefix = ExtractAlphanumeric(os.path.splitext(os.path.basename(self.outputpath))[0])
+        self.mediaprefix = extractAlphanumeric(os.path.splitext(os.path.basename(self.outputpath))[0])
         if not self.jsonpath:
             self.jsonpath = os.path.join(self.outfolder, self.mediaprefix + ".doc.json")
 
@@ -113,7 +113,7 @@ class DocxToMdConverter(object):
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             env=new_env, cwd=self.cwd
         )
-        if not (p.returncode is None):
+        if not p.returncode is None:
             raise RuntimeError(
                 'Pandoc died with exitcode "%s" before receiving input: %s' % (
                     p.returncode, p.stderr.read())

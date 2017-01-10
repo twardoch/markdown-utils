@@ -1,0 +1,40 @@
+<?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.0//EN'  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'><svg fill-rule="evenodd" preserveAspectRatio="xMidYMid meet" stroke-linecap="round" viewBox="0 0 1206 1015" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<style type="text/css">
+.brush0 { fill: rgb(255,255,255); }
+.pen0 { stroke: rgb(0,0,0); stroke-width: 1; stroke-linejoin: round; }
+.brush1 { fill: none; }
+.pen1 { stroke: rgb(0,0,0); stroke-width: 4; stroke-linejoin: round; }
+.font0 { font-size: 56px; font-family: &quot;Adobe Arabic&quot;, sans-serif; }
+.brush2 { fill: rgb(128,128,128); }
+.pen2 { stroke: rgb(0,0,0); stroke-width: 2; stroke-linejoin: round; }
+.brush3 { fill: rgb(223,223,223); }
+.brush4 { fill: rgb(0,0,0); }
+</style>
+<g>
+<polyline class="pen1" fill="none" points="19,964 1204,964"/>
+<polyline class="pen1" fill="none" points="19,964 19,940"/>
+<polyline class="pen1" fill="none" points="611,964 611,940"/>
+<polyline class="pen1" fill="none" points="1204,964 1204,940"/>
+<text class="font0" fill="rgb(0,0,0)" stroke="none" style="dominant-baseline: alphabetic;" x="-1" xml:lang="ar" xml:space="preserve" y="984">0</text>
+<text class="font0" fill="rgb(0,0,0)" stroke="none" style="dominant-baseline: alphabetic;" x="-1" xml:lang="ar" xml:space="preserve" y="827">1</text>
+<text class="font0" fill="rgb(0,0,0)" stroke="none" style="dominant-baseline: alphabetic;" x="-1" xml:lang="ar" xml:space="preserve" y="670">2</text>
+<text class="font0" fill="rgb(0,0,0)" stroke="none" style="dominant-baseline: alphabetic;" x="-1" xml:lang="ar" xml:space="preserve" y="512">3</text>
+<text class="font0" fill="rgb(0,0,0)" stroke="none" style="dominant-baseline: alphabetic;" x="-1" xml:lang="ar" xml:space="preserve" y="355">4</text>
+<text class="font0" fill="rgb(0,0,0)" stroke="none" style="dominant-baseline: alphabetic;" x="-1" xml:lang="ar" xml:space="preserve" y="198">5</text>
+<text class="font0" fill="rgb(0,0,0)" stroke="none" style="dominant-baseline: alphabetic;" x="-1" xml:lang="ar" xml:space="preserve" y="40">6</text>
+<polyline class="pen1" fill="none" points="19,964 19,20"/>
+<polyline class="pen1" fill="none" points="19,964 48,964"/>
+<polyline class="pen1" fill="none" points="19,807 48,807"/>
+<polyline class="pen1" fill="none" points="19,649 48,649"/>
+<polyline class="pen1" fill="none" points="19,492 48,492"/>
+<polyline class="pen1" fill="none" points="19,335 48,335"/>
+<polyline class="pen1" fill="none" points="19,177 48,177"/>
+<polyline class="pen1" fill="none" points="19,20 48,20"/>
+<path class="pen2 brush2" d="M 402,492  L 544,492 544,964 402,964 402,492 z" fill-rule="nonzero"/>
+<path class="pen2 brush2" d="M 994,20  L 1136,20 1136,964 994,964 994,20 z" fill-rule="nonzero"/>
+<path class="pen2 brush3" d="M 244,649  L 386,649 386,964 244,964 244,649 z" fill-rule="nonzero"/>
+<path class="pen2 brush3" d="M 836,177  L 978,177 978,964 836,964 836,177 z" fill-rule="nonzero"/>
+<path class="pen2 brush4" d="M 86,807  L 228,807 228,964 86,964 86,807 z" fill-rule="nonzero"/>
+<path class="pen2 brush4" d="M 678,335  L 820,335 820,964 678,964 678,335 z" fill-rule="nonzero"/>
+</g>
+</svg>

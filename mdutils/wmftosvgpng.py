@@ -21,6 +21,7 @@ Usage in Python:
 """
 
 __version__ = "0.4.4"
+WMF2SVG = "/usr/local/java/wmf2svg.jar"
 
 import argparse
 import base64
@@ -116,7 +117,7 @@ def toSvg(**opts):
     if not os.path.exists(inputpath):
         return (False, "No file: %s" % (inputpath))
     else:
-        args = ["java", "-Djava.awt.headless=true", "-jar", opts["with_wmf2svg"], inputpath, outputpath]
+        args = ["java", "-Djava.awt.headless=true", "-jar", opts.get("with_wmf2svg", WMF2SVG), inputpath, outputpath]
         p = subprocess.Popen(args, bufsize=4096, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = p.communicate(None)
         if stderr or p.returncode:
@@ -172,7 +173,7 @@ def parseOptions():
     parser.add_argument("-v", "--verbose", action="store_true", default=False,
                         help="report written file type and path")
     parser.add_argument('-V', '--version', action='version', version="%(prog)s (" + __version__ + ")")
-    parser.add_argument("--with-wmf2svg", default="/usr/local/java/wmf2svg.jar",
+    parser.add_argument("--with-wmf2svg", default=WMF2SVG,
                         help="path to 'wmf2svg.jar' binary")
     args = vars(parser.parse_args())
     if not args["outputbase"]:

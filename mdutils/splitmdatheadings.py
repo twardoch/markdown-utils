@@ -102,7 +102,6 @@ def make_group(ml, index):
 # Write section and add matching links at end
 def writefile(file_dir, ml, index, text, links):
     newtext = check_links(text, links)
-    # print index, ': ', text
     fname = os.path.join(file_dir, make_group(ml, index) + '.md')
     f = open(fname, 'w')
     f.write(newtext)

@@ -82,13 +82,13 @@ def pandoc_addimgdims(key, value, format, meta):
         elif os.path.splitext(src)[1].lower() == ".png":
             pass
 
-        pprint("key: %s" % repr(key))
-        pprint("attrs: %s" % repr(attrs))
-        pprint("alt: %s" % repr(alt))
-        pprint("src: %s" % repr(src))
-        pprint("title: %s" % repr(title))
-        pprint("format: %s" % repr(format))
-        pprint("meta: %s" % repr(meta))
+        # pprint("key: %s" % repr(key))
+        # pprint("attrs: %s" % repr(attrs))
+        # pprint("alt: %s" % repr(alt))
+        # pprint("src: %s" % repr(src))
+        # pprint("title: %s" % repr(title))
+        # pprint("format: %s" % repr(format))
+        # pprint("meta: %s" % repr(meta))
 
         return Image(attrs, alt, [src, title])
 

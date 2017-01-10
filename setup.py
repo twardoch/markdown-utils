@@ -99,6 +99,7 @@ setup(
         'console_scripts': [
             'docxtomd=mdutils.docxtomd:main',
             'wmftosvgpng=mdutils.wmftosvgpng:main',
+            'mkdocs2print=mdutils.mkdocs2print:main',
         ],
     },
 )

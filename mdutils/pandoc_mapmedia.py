@@ -62,7 +62,7 @@ def pprint(s):
     sys.stderr.flush()
 
 
-def ExtractAlphanumeric(InputString):
+def extractAlphanumeric(InputString):
     return "".join([ch for ch in InputString if ch in (string.ascii_letters + string.digits)])
 
 
@@ -104,7 +104,7 @@ def pandoc_wmftosvgpng(key, value, format, meta):
         altstr = ""
         if alt:
             altstr = stringify(alt)
-            altstr = ExtractAlphanumeric(altstr)[-30:]
+            altstr = extractAlphanumeric(altstr)[-30:]
             suffix = "_" + altstr
 
         dstfn = prefix + "_" + newbase + suffix + dstext
