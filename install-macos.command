@@ -1,4 +1,10 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+
+dir=${0%/*}
+if [ "$dir" = "$0" ]; then
+  dir="."
+fi
+cd "$dir"
 
 # Check if Homebrew is installed
 if [ ! -x "$(which brew)" ]; then
@@ -9,7 +15,7 @@ fi
 
 # Install pandoc if needed
 if [ ! -x "$(which pandoc)" ]; then
-	echo "# Install 'pandoc'"
+	echo "$ brew install pandoc"
 	brew install pandoc
 else
 	echo "# 'pandoc' is installed."
@@ -17,7 +23,7 @@ fi
 
 # Install ant if needed
 if [ ! -x "$(which ant)" ]; then
-	echo "# Install 'ant'"
+	echo "$ brew install ant"
 	brew install ant
 else
 	echo "# 'ant' is installed."
@@ -25,7 +31,7 @@ fi
 
 # Install wmf2svg if needed
 if [ ! -e "/usr/local/java/wmf2svg.jar" ]; then
-	echo "# Install 'wmf2svg'"
+	echo "# Installing 'wmf2svg'..."
 	mkdir /usr/local/java
 	wget https://github.com/hidekatsu-izuno/wmf2svg/archive/master.zip
 	unzip master.zip
@@ -48,7 +54,7 @@ else
 fi
 
 # Install me
-echo "# Install 'mdutils'"
-pip install --user --upgrade -r requirements.txt
+echo "# Installing 'mdutils'"
+pip install --user --upgrade -r py-requirements.txt
 pip install --user --upgrade .
 echo "# Done!"
