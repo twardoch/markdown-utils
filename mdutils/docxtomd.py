@@ -247,7 +247,7 @@ class DocxToMdConverter(object):
                     'markdown.extensions.toc',
                     'pymdownx.betterem', 'pymdownx.headeranchor', 'pymdownx.magiclink',
                     'pymdownx.mark', 'pymdownx.superfences',
-                    'mdx_sections', 'mdx_steroids.figcaption', 'mdx_steroids.wikilink',
+                    'mdx_sections', 'figcap', 'mdx_steroids.wikilink',
                 ]
                 mdfile = codecs.open(self.outputpath, mode="r", encoding="utf-8")
                 md = mdfile.read()
