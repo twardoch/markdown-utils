@@ -1,9 +1,9 @@
 sh>=1.11
 pandocfilters>=1.4.1
 scour>=0.35
-Markdown>=2.6.7
-mkdocs>=0.16.0
-git+https://github.com/facelessuser/pymdown-extensions.git
+Markdown>=2.6.8
+mkdocs>=0.16.3
+pymdown-extensions>=3.1.0
 pyembed>=1.3.3
 pyembed-markdown>=1.1.0
 markdown-include>=0.5.1
