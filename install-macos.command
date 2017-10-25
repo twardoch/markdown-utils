@@ -6,19 +6,22 @@ if [ "$dir" = "$0" ]; then
 fi
 cd "$dir"
 
-# Check if Homebrew is installed
+# Check if brew is installed
 if [ ! -x "$(which brew)" ]; then
-	echo "# You must install Homebrew first!"
-	open "http://brew.sh/"
-	exit 1
-fi
+	echo "# Installing 'brew'..."
+	/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+else
+	echo "# Updating 'brew'..."
+	brew update
+fi 
 
 # Install pandoc if needed
 if [ ! -x "$(which pandoc)" ]; then
 	echo "$ brew install pandoc"
 	brew install pandoc
 else
-	echo "# 'pandoc' is installed."
+	echo "$ brew upgrade pandoc && brew cleanup pandoc"
+	brew upgrade pandoc && brew cleanup pandoc
 fi 
 
 # Install ant if needed
@@ -26,7 +29,8 @@ if [ ! -x "$(which ant)" ]; then
 	echo "$ brew install ant"
 	brew install ant
 else
-	echo "# 'ant' is installed."
+	echo "$ brew upgrade ant && brew cleanup ant"
+	brew upgrade ant && brew cleanup ant
 fi
 
 # Install wmf2svg if needed

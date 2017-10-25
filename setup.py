@@ -25,7 +25,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.4.3',
+    version='0.4.5',
 
     description='Python package for working with Markdown. Includes `docxtomd`, a Word .docx to Markdown converted '
                 'using `pandoc` and `wmf2svg`, and `wmftosvgpng`, an intelligent WMF to SVG or PNG converter using '
@@ -86,7 +86,7 @@ setup(
     install_requires=[
         'sh>=1.11', 'scour>=0.35', 'pandocfilters>=1.4.1',
         'Markdown>=2.6.8', 'pymdown-extensions>=3.1.0', 'markdown-include>=0.5.1',
-        'mdx_sections>=0.1', 'mdx_steroids>=0.4.0',
+        'mdx_sections>=0.1', 'mdx_steroids>=0.4.0', 'Pillow>=4.2.1', 
     ],
     dependency_links=[
         'git+https://github.com/twardoch/markdown-steroids.git/@master#egg=mdx_steroids-0.4.0',

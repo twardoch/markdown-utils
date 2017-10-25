@@ -1,6 +1,7 @@
 sh>=1.11
-pandocfilters>=1.4.1
+Pillow>=4.2.1
 scour>=0.35
+pandocfilters>=1.4.1
 Markdown>=2.6.8
 mkdocs>=0.16.3
 pymdown-extensions>=3.1.0

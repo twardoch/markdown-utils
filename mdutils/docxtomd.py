@@ -11,9 +11,16 @@ or bitmap images contained in the .docx into either .svg or .png.
 
 example: 
   $ ./docxtomd.py --html -d test/test1 test/test1.docx
+
+changes:
+  2017-10-25: Fixes
+  2017-07-13: Added support for BMP output via PIL/Pillow
+
+todo:
+  * Add support for EMF
 """
 
-__version__ = "0.4.2"
+__version__ = "0.4.5"
 
 import argparse
 import codecs
@@ -28,6 +35,12 @@ import sys
 import warnings
 
 import wmftosvgpng
+
+try:
+    import PIL.BmpImagePlugin
+except ImportError:
+    print("PIL or Pillow not found, run: pip install --user Pillow")
+    sys.exit(2)
 
 try:
     import markdown
@@ -61,11 +74,13 @@ class DocxToMdConverter(object):
         self.html = opts.get("html", False)
         self.keepimgdims = opts.get("keep_imgdims", False)
         self.recalcimgdims = opts.get("recalc_imgdims", False)
+        self.recalcmaxdims = opts.get("recalc_maxdims", 500)
         self.success = True
         self.stdout = None
         self.stderr = None
         self.mediafolder = self.imgfolder
         self.cwd = os.path.dirname(os.path.realpath(os.getcwd()))
+        self.mediainfopath = None
 
     def preparePaths(self):
         if not self.inputpath:
@@ -128,37 +143,46 @@ class DocxToMdConverter(object):
 
     def prepareMedia(self):
         self.mediamap = {}
+        if self.mediafolder: 
+            for bmpfn in fnmatch.filter(os.listdir(self.mediafolder), '*.bmp'):
+                fullsrc = os.path.join(self.mediafolder, bmpfn)
+                fullout = os.path.splitext(fullsrc)[0] + '.png'
+                pngfn = os.path.splitext(bmpfn)[0] + '.png'
+                PIL.BmpImagePlugin.DibImageFile(fullsrc).save(fullout)
+                self.mediamap[bmpfn] = pngfn
 
-        for pngfn in fnmatch.filter(os.listdir(self.mediafolder), '*.png'):
-            self.mediamap[pngfn] = pngfn
-        for wmffn in fnmatch.filter(os.listdir(self.mediafolder), '*.wmf'):
-            fullsrc = os.path.join(self.mediafolder, wmffn)
-            fulloutbase = os.path.splitext(fullsrc)[0]
-            rettype, retpath = wmftosvgpng.toSvgOrPng(**{
-                'inputpath' : fullsrc,
-                'outputbase': fulloutbase,
-                'compress'  : False,
-                'verbose'   : False,
-                'remove'    : not self.debug,
-                'wmf2svg'   : self.wmf2svg,
-            })
-            if rettype:
-                retfn = os.path.basename(retpath)
-                self.mediamap[wmffn] = retfn
-        self.mediainfopath = os.path.join(self.outfolder, self.mediaprefix + ".media.json")
-        mediainfofile = file(self.mediainfopath, "w")
-        json.dump({
-            "srcfull"  : self.mediafolder,
-            "dstfull"  : self.imgfolder,
-            "prefix"   : self.mediaprefix,
-            "srcsubstr": u"./media/",
-            "dstsubstr": u"img/",
-            "map"      : self.mediamap
-        }, mediainfofile)
-        mediainfofile.close()
-        os.environ['pandoc_filter_mapmedia'] = self.mediainfopath
-        os.environ['pandoc_filter_keepimgdims'] = '1' if self.keepimgdims else '0'
-        os.environ['pandoc_filter_recalcimgdims'] = '1' if self.recalcimgdims else '0'
+            for pngfn in fnmatch.filter(os.listdir(self.mediafolder), '*.png'):
+                self.mediamap[pngfn] = pngfn
+
+            for wmffn in fnmatch.filter(os.listdir(self.mediafolder), '*.wmf'):
+                fullsrc = os.path.join(self.mediafolder, wmffn)
+                fulloutbase = os.path.splitext(fullsrc)[0]
+                rettype, retpath = wmftosvgpng.toSvgOrPng(**{
+                    'inputpath' : fullsrc,
+                    'outputbase': fulloutbase,
+                    'compress'  : False,
+                    'verbose'   : False,
+                    'remove'    : not self.debug,
+                    'wmf2svg'   : self.wmf2svg,
+                })
+                if rettype:
+                    retfn = os.path.basename(retpath)
+                    self.mediamap[wmffn] = retfn
+            self.mediainfopath = os.path.join(self.outfolder, self.mediaprefix + ".media.json")
+            mediainfofile = file(self.mediainfopath, "w")
+            json.dump({
+                "srcfull"  : self.mediafolder,
+                "dstfull"  : self.imgfolder,
+                "prefix"   : self.mediaprefix,
+                "srcsubstr": u"./media/",
+                "dstsubstr": u"img/",
+                "map"      : self.mediamap
+            }, mediainfofile)
+            mediainfofile.close()
+            os.environ['pandoc_filter_mapmedia'] = self.mediainfopath
+            os.environ['pandoc_filter_keepimgdims'] = '1' if self.keepimgdims else '0'
+            os.environ['pandoc_filter_recalcimgdims'] = '1' if self.recalcimgdims else '0'
+            os.environ['pandoc_filter_recalcmaxdims'] = str(self.recalcmaxdims)
 
     def convertJsonToMd(self):
         pdArgs = [
@@ -169,6 +193,7 @@ class DocxToMdConverter(object):
 
         pdFilters = [
             os.path.join(os.path.dirname(__file__), 'pandoc_mapmedia.py'),
+            os.path.join(os.path.dirname(__file__), 'pandoc_addimgdims.py'),
         ]
 
         pdMdExt = [
@@ -275,12 +300,21 @@ class DocxToMdConverter(object):
         if self.success and self.html:
             self.convertMdToHtml()
         if not self.debug:
-            try:
-                os.remove(self.jsonpath)
-                os.remove(self.mediainfopath)
-                shutil.rmtree(self.mediafolder)
-            except:
-                warnings.warn("Cannot clean up!")
+            if self.jsonpath: 
+                try:
+                    os.remove(self.jsonpath)
+                except:
+                    warnings.warn("Cannot clean up %s" % (self.jsonpath))
+            if self.mediainfopath: 
+                try:
+                    os.remove(self.mediainfopath)
+                except:
+                    warnings.warn("Cannot clean up %s" % (self.mediainfopath))
+            if self.mediafolder: 
+                try:
+                    shutil.rmtree(self.mediafolder)
+                except:
+                    warnings.warn("Cannot clean up %s" % (self.mediafolder))
 
 
 def parseOptions():
@@ -302,7 +336,9 @@ def parseOptions():
     grProc.add_argument("-k", "--keep-imgdims", action="store_true", default=False,
                         help="keep original image height and width")
     grProc.add_argument("-I", "--recalc-imgdims", action="store_true", default=False,
-                        help="recalculate image height and width")
+                        help="recalculate image px height and width")
+    grProc.add_argument("-M", "--recalc-maxdims", action="store", type=int, default=500, 
+                        help="max image width in px, otherwise 100%%, default: 500")
     grOutput = parser.add_argument_group('additional conversion options')
     grOutput.add_argument("-H", "--html", action="store_true", default=False,
                           help="also generate HTML from Markdown")

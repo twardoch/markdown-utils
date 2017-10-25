@@ -45,18 +45,24 @@
     ```
 """
 
-__version__ = "0.4.3"
+__version__ = "0.4.4"
 
+import json
 import os
 import sys
+try:
+    import PIL.Image
+except:
+    pprint("PIL or Pillow not found, run: pip install --user Pillow")
 
 from pandocfilters import Image, toJSONFilter
 
 
 def pprint(s):
-    sys.stderr.write(unicode(s).encode('utf-8'))
-    sys.stderr.write(u"\n".encode('utf-8'))
-    sys.stderr.flush()
+    log = sys.stderr
+    log.write(unicode(s).encode('utf-8'))
+    log.write(u"\n".encode('utf-8'))
+    log.flush()
 
 
 def pandoc_addimgdims(key, value, format, meta):
@@ -74,21 +80,38 @@ def pandoc_addimgdims(key, value, format, meta):
     if key == 'Image':
         keepimgdims = True if os.environ.get('pandoc_filter_keepimgdims', '0') == '1' else False
         recalcimgdims = True if os.environ.get('pandoc_filter_recalcimgdims', '0') == '1' else False
+        recalcmaxdims = os.environ.get('pandoc_filter_recalcmaxdims', '500')
+        try:
+            recalcmaxdims = int(recalcmaxdims)
+        except ValueError:
+            recalcmaxdims = 500
+        mediainfopath = os.environ.get('pandoc_filter_mapmedia', None)
         attrs, alt, [src, title] = value
+        if not mediainfopath:
+            return Image(attrs, alt, [src, title])
 
-        if os.path.splitext(src)[1].lower() == ".svg":
-            pass
+        mediainfo = json.load(file(mediainfopath))
+        dstfolder = mediainfo['dstfull']
 
-        elif os.path.splitext(src)[1].lower() == ".png":
-            pass
+        srcpath = os.path.join(dstfolder, os.path.split(src)[1])
 
-        # pprint("key: %s" % repr(key))
-        # pprint("attrs: %s" % repr(attrs))
-        # pprint("alt: %s" % repr(alt))
-        # pprint("src: %s" % repr(src))
-        # pprint("title: %s" % repr(title))
-        # pprint("format: %s" % repr(format))
-        # pprint("meta: %s" % repr(meta))
+        if os.path.splitext(srcpath)[1].lower() == ".svg":
+            pil = PIL.Image.open(srcpath)
+            pprint("%s %s" % (src, pil.size))
+            pprint(recalcmaxdims)
+
+        elif os.path.splitext(srcpath)[1].lower() == ".png":
+            pil = PIL.Image.open(srcpath)
+            pprint("%s %s" % (src, pil.size))
+            pprint(recalcmaxdims)
+
+        pprint("key: %s" % repr(key))
+        pprint("attrs: %s" % repr(attrs))
+        pprint("alt: %s" % repr(alt))
+        pprint("src: %s" % repr(src))
+        pprint("title: %s" % repr(title))
+        pprint("format: %s" % repr(format))
+        pprint("meta: %s" % repr(meta))
 
         return Image(attrs, alt, [src, title])
 
