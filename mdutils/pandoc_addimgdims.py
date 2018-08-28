@@ -95,23 +95,23 @@ def pandoc_addimgdims(key, value, format, meta):
 
         srcpath = os.path.join(dstfolder, os.path.split(src)[1])
 
-        if os.path.splitext(srcpath)[1].lower() == ".svg":
-            pil = PIL.Image.open(srcpath)
-            pprint("%s %s" % (src, pil.size))
-            pprint(recalcmaxdims)
-
-        elif os.path.splitext(srcpath)[1].lower() == ".png":
-            pil = PIL.Image.open(srcpath)
-            pprint("%s %s" % (src, pil.size))
-            pprint(recalcmaxdims)
-
-        pprint("key: %s" % repr(key))
-        pprint("attrs: %s" % repr(attrs))
-        pprint("alt: %s" % repr(alt))
-        pprint("src: %s" % repr(src))
-        pprint("title: %s" % repr(title))
-        pprint("format: %s" % repr(format))
-        pprint("meta: %s" % repr(meta))
+        #if os.path.splitext(srcpath)[1].lower() == ".svg":
+        #    pil = PIL.Image.open(srcpath)
+        #    pprint("%s %s" % (src, pil.size))
+        #    pprint(recalcmaxdims)
+#
+        #elif os.path.splitext(srcpath)[1].lower() == ".png":
+        #    pil = PIL.Image.open(srcpath)
+        #    pprint("%s %s" % (src, pil.size))
+        #    pprint(recalcmaxdims)
+#
+        #pprint("key: %s" % repr(key))
+        #pprint("attrs: %s" % repr(attrs))
+        #pprint("alt: %s" % repr(alt))
+        #pprint("src: %s" % repr(src))
+        #pprint("title: %s" % repr(title))
+        #pprint("format: %s" % repr(format))
+        #pprint("meta: %s" % repr(meta))
 
         return Image(attrs, alt, [src, title])
 

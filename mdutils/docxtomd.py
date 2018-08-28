@@ -186,7 +186,7 @@ class DocxToMdConverter(object):
 
     def convertJsonToMd(self):
         pdArgs = [
-            '--smart', '--section-divs', '--atx-headers', '--normalize'
+            '--section-divs', '--atx-headers'
         ]
         if self.toc:
             pdArgs.append('--toc')
@@ -204,7 +204,7 @@ class DocxToMdConverter(object):
             '+footnotes', '+hard_line_breaks', '+header_attributes', '+implicit_figures',
             '+implicit_header_references', '+intraword_underscores', '+line_blocks',
             '+link_attributes', '+pandoc_title_block', '+pipe_tables', '+raw_html',
-            '+shortcut_reference_links', '+strikeout'
+            '+shortcut_reference_links', '+strikeout', '+smart'
         ]
         pdMdOutFmt = 'markdown_github' + ''.join(pdMdExt)
 
@@ -227,7 +227,7 @@ class DocxToMdConverter(object):
 
     def convertDocxToJson(self):
         pdArgs = [
-            '--smart', '--section-divs', '--atx-headers'
+            '--section-divs', '--atx-headers'
         ]
         if self.toc:
             pdArgs.append('--toc')
