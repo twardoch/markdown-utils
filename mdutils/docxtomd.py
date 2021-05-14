@@ -5,11 +5,11 @@
   Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
   https://github.com/twardoch/markdown-utils
 
-This tool converts a Word .docx file to Markdown using pandoc. 
-Unlike pandoc, it intelligently converts and names the vector 
-or bitmap images contained in the .docx into either .svg or .png. 
+This tool converts a Word .docx file to Markdown using pandoc.
+Unlike pandoc, it intelligently converts and names the vector
+or bitmap images contained in the .docx into either .svg or .png.
 
-example: 
+example:
   $ ./docxtomd.py --html -d test/test1 test/test1.docx
 
 changes:
@@ -34,7 +34,7 @@ import subprocess
 import sys
 import warnings
 
-import wmftosvgpng
+from mdutils import wmftosvgpng
 
 try:
     import PIL.BmpImagePlugin
@@ -139,11 +139,11 @@ class DocxToMdConverter(object):
         except OSError:
             self.success = False
             raise RuntimeError('Pandoc died with exitcode "%s" during conversion.' % (p.returncode))
-        assert self.stdout == ""
+        #assert self.stdout == ""
 
     def prepareMedia(self):
         self.mediamap = {}
-        if self.mediafolder: 
+        if self.mediafolder:
             for bmpfn in fnmatch.filter(os.listdir(self.mediafolder), '*.bmp'):
                 fullsrc = os.path.join(self.mediafolder, bmpfn)
                 fullout = os.path.splitext(fullsrc)[0] + '.png'
@@ -169,7 +169,7 @@ class DocxToMdConverter(object):
                     retfn = os.path.basename(retpath)
                     self.mediamap[wmffn] = retfn
             self.mediainfopath = os.path.join(self.outfolder, self.mediaprefix + ".media.json")
-            mediainfofile = file(self.mediainfopath, "w")
+            mediainfofile = open(self.mediainfopath, "w")
             json.dump({
                 "srcfull"  : self.mediafolder,
                 "dstfull"  : self.imgfolder,
@@ -288,7 +288,7 @@ class DocxToMdConverter(object):
                 self.success = False
 
     def convertDocxToMd(self):
-        # For various reasons, we run pandoc twice: 
+        # For various reasons, we run pandoc twice:
         # Once docx-to-json, then json-to-md
         self.preparePaths()
         if self.success:
@@ -300,17 +300,17 @@ class DocxToMdConverter(object):
         if self.success and self.html:
             self.convertMdToHtml()
         if not self.debug:
-            if self.jsonpath: 
+            if self.jsonpath:
                 try:
                     os.remove(self.jsonpath)
                 except:
                     warnings.warn("Cannot clean up %s" % (self.jsonpath))
-            if self.mediainfopath: 
+            if self.mediainfopath:
                 try:
                     os.remove(self.mediainfopath)
                 except:
                     warnings.warn("Cannot clean up %s" % (self.mediainfopath))
-            if self.mediafolder: 
+            if self.mediafolder:
                 try:
                     shutil.rmtree(self.mediafolder)
                 except:
@@ -337,7 +337,7 @@ def parseOptions():
                         help="keep original image height and width")
     grProc.add_argument("-I", "--recalc-imgdims", action="store_true", default=False,
                         help="recalculate image px height and width")
-    grProc.add_argument("-M", "--recalc-maxdims", action="store", type=int, default=500, 
+    grProc.add_argument("-M", "--recalc-maxdims", action="store", type=int, default=500,
                         help="max image width in px, otherwise 100%%, default: 500")
     grOutput = parser.add_argument_group('additional conversion options')
     grOutput.add_argument("-H", "--html", action="store_true", default=False,
