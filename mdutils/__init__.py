@@ -1,4 +1,3 @@
-""" mdutils/__init__.py """
-# -*- coding: utf-8 -*
+"""mdutils/__init__.py"""
 
-__all__ = ['docxtomd', 'wmftosvgpng']
+__all__ = ["docxtomd", "wmftosvgpng"]

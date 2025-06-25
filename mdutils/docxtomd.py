@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """docxtomd
   Word .docx to Markdown converter
   Copyright (c) 2016 by Adam Twardoch, licensed under Apache 2
@@ -51,10 +50,12 @@ except ImportError:
 
 
 def extractAlphanumeric(InputString):
-    return "".join([ch for ch in InputString if ch in (string.ascii_letters + string.digits)])
+    return "".join(
+        [ch for ch in InputString if ch in (string.ascii_letters + string.digits)]
+    )
 
 
-class DocxToMdConverter(object):
+class DocxToMdConverter:
     def __init__(self, **opts):
         """
         Args:
@@ -93,7 +94,9 @@ class DocxToMdConverter(object):
         self.outputpath = os.path.realpath(os.path.normpath(self.outputpath))
         if self.outfolder:
             self.outfolder = os.path.realpath(os.path.normpath(self.outfolder))
-            self.outputpath = os.path.join(self.outfolder, os.path.basename(self.outputpath))
+            self.outputpath = os.path.join(
+                self.outfolder, os.path.basename(self.outputpath)
+            )
         else:
             self.outfolder = os.path.dirname(self.outputpath)
         if not os.path.exists(self.outfolder):
@@ -110,7 +113,9 @@ class DocxToMdConverter(object):
             except:
                 warnings.warn("Cannot create folder %s" % (self.imgfolder))
                 self.success = False
-        self.mediaprefix = extractAlphanumeric(os.path.splitext(os.path.basename(self.outputpath))[0])
+        self.mediaprefix = extractAlphanumeric(
+            os.path.splitext(os.path.basename(self.outputpath))[0]
+        )
         if not self.jsonpath:
             self.jsonpath = os.path.join(self.outfolder, self.mediaprefix + ".doc.json")
 
@@ -124,98 +129,131 @@ class DocxToMdConverter(object):
         if self.debug:
             print("Running: " + " ".join(args))
         p = subprocess.Popen(
-            args, bufsize=4096, stdin=None,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            env=new_env, cwd=self.cwd
+            args,
+            bufsize=4096,
+            stdin=None,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=new_env,
+            cwd=self.cwd,
         )
-        if not p.returncode is None:
+        if p.returncode is not None:
             raise RuntimeError(
-                'Pandoc died with exitcode "%s" before receiving input: %s' % (
-                    p.returncode, p.stderr.read())
+                'Pandoc died with exitcode "{}" before receiving input: {}'.format(
+                    p.returncode, p.stderr.read()
+                )
             )
         try:
             self.stdout, self.stderr = p.communicate(None)
             self.success = True
         except OSError:
             self.success = False
-            raise RuntimeError('Pandoc died with exitcode "%s" during conversion.' % (p.returncode))
-        #assert self.stdout == ""
+            raise RuntimeError(
+                'Pandoc died with exitcode "%s" during conversion.' % (p.returncode)
+            )
+        # assert self.stdout == ""
 
     def prepareMedia(self):
         self.mediamap = {}
         if self.mediafolder:
-            for bmpfn in fnmatch.filter(os.listdir(self.mediafolder), '*.bmp'):
+            for bmpfn in fnmatch.filter(os.listdir(self.mediafolder), "*.bmp"):
                 fullsrc = os.path.join(self.mediafolder, bmpfn)
-                fullout = os.path.splitext(fullsrc)[0] + '.png'
-                pngfn = os.path.splitext(bmpfn)[0] + '.png'
+                fullout = os.path.splitext(fullsrc)[0] + ".png"
+                pngfn = os.path.splitext(bmpfn)[0] + ".png"
                 PIL.BmpImagePlugin.DibImageFile(fullsrc).save(fullout)
                 self.mediamap[bmpfn] = pngfn
 
-            for pngfn in fnmatch.filter(os.listdir(self.mediafolder), '*.png'):
+            for pngfn in fnmatch.filter(os.listdir(self.mediafolder), "*.png"):
                 self.mediamap[pngfn] = pngfn
 
-            for wmffn in fnmatch.filter(os.listdir(self.mediafolder), '*.wmf'):
+            for wmffn in fnmatch.filter(os.listdir(self.mediafolder), "*.wmf"):
                 fullsrc = os.path.join(self.mediafolder, wmffn)
                 fulloutbase = os.path.splitext(fullsrc)[0]
-                rettype, retpath = wmftosvgpng.toSvgOrPng(**{
-                    'inputpath' : fullsrc,
-                    'outputbase': fulloutbase,
-                    'compress'  : False,
-                    'verbose'   : False,
-                    'remove'    : not self.debug,
-                    'wmf2svg'   : self.wmf2svg,
-                })
+                rettype, retpath = wmftosvgpng.toSvgOrPng(
+                    **{
+                        "inputpath": fullsrc,
+                        "outputbase": fulloutbase,
+                        "compress": False,
+                        "verbose": False,
+                        "remove": not self.debug,
+                        "wmf2svg": self.wmf2svg,
+                    }
+                )
                 if rettype:
                     retfn = os.path.basename(retpath)
                     self.mediamap[wmffn] = retfn
-            self.mediainfopath = os.path.join(self.outfolder, self.mediaprefix + ".media.json")
+            self.mediainfopath = os.path.join(
+                self.outfolder, self.mediaprefix + ".media.json"
+            )
             mediainfofile = open(self.mediainfopath, "w")
-            json.dump({
-                "srcfull"  : self.mediafolder,
-                "dstfull"  : self.imgfolder,
-                "prefix"   : self.mediaprefix,
-                "srcsubstr": u"./media/",
-                "dstsubstr": u"img/",
-                "map"      : self.mediamap
-            }, mediainfofile)
+            json.dump(
+                {
+                    "srcfull": self.mediafolder,
+                    "dstfull": self.imgfolder,
+                    "prefix": self.mediaprefix,
+                    "srcsubstr": "./media/",
+                    "dstsubstr": "img/",
+                    "map": self.mediamap,
+                },
+                mediainfofile,
+            )
             mediainfofile.close()
-            os.environ['pandoc_filter_mapmedia'] = self.mediainfopath
-            os.environ['pandoc_filter_keepimgdims'] = '1' if self.keepimgdims else '0'
-            os.environ['pandoc_filter_recalcimgdims'] = '1' if self.recalcimgdims else '0'
-            os.environ['pandoc_filter_recalcmaxdims'] = str(self.recalcmaxdims)
+            os.environ["pandoc_filter_mapmedia"] = self.mediainfopath
+            os.environ["pandoc_filter_keepimgdims"] = "1" if self.keepimgdims else "0"
+            os.environ["pandoc_filter_recalcimgdims"] = (
+                "1" if self.recalcimgdims else "0"
+            )
+            os.environ["pandoc_filter_recalcmaxdims"] = str(self.recalcmaxdims)
 
     def convertJsonToMd(self):
-        pdArgs = [
-            '--section-divs', '--atx-headers'
-        ]
+        pdArgs = ["--section-divs", "--atx-headers"]
         if self.toc:
-            pdArgs.append('--toc')
+            pdArgs.append("--toc")
 
         pdFilters = [
-            os.path.join(os.path.dirname(__file__), 'pandoc_mapmedia.py'),
-            os.path.join(os.path.dirname(__file__), 'pandoc_addimgdims.py'),
+            os.path.join(os.path.dirname(__file__), "pandoc_mapmedia.py"),
+            os.path.join(os.path.dirname(__file__), "pandoc_addimgdims.py"),
         ]
 
         pdMdExt = [
-            '+angle_brackets_escapable', '+ascii_identifiers', '+auto_identifiers',
-            '+autolink_bare_uris', '+backtick_code_blocks', '+blank_before_blockquote',
-            '+blank_before_header', '+bracketed_spans', '+definition_lists', '+emoji',
-            '+escaped_line_breaks', '+fenced_code_attributes', '+fenced_code_blocks',
-            '+footnotes', '+hard_line_breaks', '+header_attributes', '+implicit_figures',
-            '+implicit_header_references', '+intraword_underscores', '+line_blocks',
-            '+link_attributes', '+pandoc_title_block', '+pipe_tables', '+raw_html',
-            '+shortcut_reference_links', '+strikeout', '+smart'
+            "+angle_brackets_escapable",
+            "+ascii_identifiers",
+            "+auto_identifiers",
+            "+autolink_bare_uris",
+            "+backtick_code_blocks",
+            "+blank_before_blockquote",
+            "+blank_before_header",
+            "+bracketed_spans",
+            "+definition_lists",
+            "+emoji",
+            "+escaped_line_breaks",
+            "+fenced_code_attributes",
+            "+fenced_code_blocks",
+            "+footnotes",
+            "+hard_line_breaks",
+            "+header_attributes",
+            "+implicit_figures",
+            "+implicit_header_references",
+            "+intraword_underscores",
+            "+line_blocks",
+            "+link_attributes",
+            "+pandoc_title_block",
+            "+pipe_tables",
+            "+raw_html",
+            "+shortcut_reference_links",
+            "+strikeout",
+            "+smart",
         ]
-        pdMdOutFmt = 'markdown_github' + ''.join(pdMdExt)
+        pdMdOutFmt = "markdown_github" + "".join(pdMdExt)
 
         args = [self.pandoc]
-        args.append('--from=' + 'json')
-        args.append('--to=' + pdMdOutFmt)
+        args.append("--from=" + "json")
+        args.append("--to=" + pdMdOutFmt)
         args.append(self.jsonpath)
         args.append("--output=" + self.outputpath)
         args.extend(pdArgs)
         if pdFilters:
-            f = ['--filter=' + x for x in pdFilters]
+            f = ["--filter=" + x for x in pdFilters]
             args.extend(f)
 
         self.pandocRun(args)
@@ -226,24 +264,22 @@ class DocxToMdConverter(object):
         self.success = True
 
     def convertDocxToJson(self):
-        pdArgs = [
-            '--section-divs', '--atx-headers'
-        ]
+        pdArgs = ["--section-divs", "--atx-headers"]
         if self.toc:
-            pdArgs.append('--toc')
+            pdArgs.append("--toc")
         if self.format == "docx":
-            pdArgs.append('--extract-media=.')
+            pdArgs.append("--extract-media=.")
         pdFilters = []
-        pdMdOutFmt = 'json'
+        pdMdOutFmt = "json"
 
         args = [self.pandoc]
-        args.append('--from=' + self.format)
-        args.append('--to=' + pdMdOutFmt)
+        args.append("--from=" + self.format)
+        args.append("--to=" + pdMdOutFmt)
         args.append(self.inputpath)
         args.append("--output=" + self.jsonpath)
         args.extend(pdArgs)
         if pdFilters:
-            f = ['--filter=' + x for x in pdFilters]
+            f = ["--filter=" + x for x in pdFilters]
             args.extend(f)
 
         self.pandocRun(args)
@@ -265,21 +301,32 @@ class DocxToMdConverter(object):
         else:
             try:
                 mdexts = [
-                    'markdown.extensions.admonition', 'markdown.extensions.attr_list',
-                    'markdown.extensions.def_list', 'markdown.extensions.footnotes',
-                    'markdown.extensions.meta', 'markdown.extensions.smarty',
-                    'markdown.extensions.tables', 'markdown.extensions.tables',
-                    'markdown.extensions.toc',
-                    'pymdownx.betterem', 'pymdownx.headeranchor', 'pymdownx.magiclink',
-                    'pymdownx.mark', 'pymdownx.superfences',
-                    'mdx_sections', 'figcap', 'mdx_steroids.wikilink',
+                    "markdown.extensions.admonition",
+                    "markdown.extensions.attr_list",
+                    "markdown.extensions.def_list",
+                    "markdown.extensions.footnotes",
+                    "markdown.extensions.meta",
+                    "markdown.extensions.smarty",
+                    "markdown.extensions.tables",
+                    "markdown.extensions.tables",
+                    "markdown.extensions.toc",
+                    "pymdownx.betterem",
+                    "pymdownx.headeranchor",
+                    "pymdownx.magiclink",
+                    "pymdownx.mark",
+                    "pymdownx.superfences",
+                    "mdx_sections",
+                    "figcap",
+                    "mdx_steroids.wikilink",
                 ]
                 mdfile = codecs.open(self.outputpath, mode="r", encoding="utf-8")
                 md = mdfile.read()
                 html = markdown.markdown(md, extensions=mdexts)
                 htmlfile = codecs.open(
                     os.path.splitext(self.outputpath)[0] + ".html",
-                    "w", encoding="utf-8", errors="xmlcharrefreplace"
+                    "w",
+                    encoding="utf-8",
+                    errors="xmlcharrefreplace",
                 )
                 htmlfile.write(html)
                 htmlfile.close()
@@ -319,39 +366,86 @@ class DocxToMdConverter(object):
 
 def parseOptions():
     parser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    grInput = parser.add_argument_group('input and output options')
+    grInput = parser.add_argument_group("input and output options")
     grInput.add_argument("inputpath", help="input.docx file")
-    grInput.add_argument("-f", "--format", action="store", default='docx',
-                         help="input format, default 'docx'")
-    grInput.add_argument("outputpath", nargs='?', default=None,
-                         help="output.md file, default to input.md")
-    grInput.add_argument("-d", "--out-dir", action="store", default=None,
-                         help="output folder, default to current")
-    grProc = parser.add_argument_group('conversion options')
-    grProc.add_argument("-t", "--toc", action="store_true", default=False,
-                        help="generate TOC")
-    grProc.add_argument("-k", "--keep-imgdims", action="store_true", default=False,
-                        help="keep original image height and width")
-    grProc.add_argument("-I", "--recalc-imgdims", action="store_true", default=False,
-                        help="recalculate image px height and width")
-    grProc.add_argument("-M", "--recalc-maxdims", action="store", type=int, default=500,
-                        help="max image width in px, otherwise 100%%, default: 500")
-    grOutput = parser.add_argument_group('additional conversion options')
-    grOutput.add_argument("-H", "--html", action="store_true", default=False,
-                          help="also generate HTML from Markdown")
-    grOther = parser.add_argument_group('other options')
-    grOther.add_argument('-V', '--version', action='version', version="%(prog)s (" + __version__ + ")")
-    grOther.add_argument("-D", "--debug", action="store_true", default=False,
-                         help="keep intermediate files")
-    grOther.add_argument("-v", "--verbose", action="store_true",
-                         help="increase output verbosity")
-    grOther.add_argument("--with-pandoc", default="/usr/local/bin/pandoc",
-                         help="path to 'pandoc' binary")
-    grOther.add_argument("--with-wmf2svg", default="/usr/local/java/wmf2svg.jar",
-                         help="path to 'wmf2svg.jar' binary")
+    grInput.add_argument(
+        "-f",
+        "--format",
+        action="store",
+        default="docx",
+        help="input format, default 'docx'",
+    )
+    grInput.add_argument(
+        "outputpath",
+        nargs="?",
+        default=None,
+        help="output.md file, default to input.md",
+    )
+    grInput.add_argument(
+        "-d",
+        "--out-dir",
+        action="store",
+        default=None,
+        help="output folder, default to current",
+    )
+    grProc = parser.add_argument_group("conversion options")
+    grProc.add_argument(
+        "-t", "--toc", action="store_true", default=False, help="generate TOC"
+    )
+    grProc.add_argument(
+        "-k",
+        "--keep-imgdims",
+        action="store_true",
+        default=False,
+        help="keep original image height and width",
+    )
+    grProc.add_argument(
+        "-I",
+        "--recalc-imgdims",
+        action="store_true",
+        default=False,
+        help="recalculate image px height and width",
+    )
+    grProc.add_argument(
+        "-M",
+        "--recalc-maxdims",
+        action="store",
+        type=int,
+        default=500,
+        help="max image width in px, otherwise 100%%, default: 500",
+    )
+    grOutput = parser.add_argument_group("additional conversion options")
+    grOutput.add_argument(
+        "-H",
+        "--html",
+        action="store_true",
+        default=False,
+        help="also generate HTML from Markdown",
+    )
+    grOther = parser.add_argument_group("other options")
+    grOther.add_argument(
+        "-V", "--version", action="version", version="%(prog)s (" + __version__ + ")"
+    )
+    grOther.add_argument(
+        "-D",
+        "--debug",
+        action="store_true",
+        default=False,
+        help="keep intermediate files",
+    )
+    grOther.add_argument(
+        "-v", "--verbose", action="store_true", help="increase output verbosity"
+    )
+    grOther.add_argument(
+        "--with-pandoc", default="/usr/local/bin/pandoc", help="path to 'pandoc' binary"
+    )
+    grOther.add_argument(
+        "--with-wmf2svg",
+        default="/usr/local/java/wmf2svg.jar",
+        help="path to 'wmf2svg.jar' binary",
+    )
     args = parser.parse_args()
     return vars(args)
 
@@ -371,5 +465,5 @@ def main():
         sys.exit(2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 Pandoc filter to aid conversion of WMF files to SVG or PNG.
 
@@ -57,13 +56,15 @@ from pandocfilters import Image, Str, stringify, toJSONFilter
 
 
 def pprint(s):
-    sys.stderr.write(unicode(s).encode('utf-8'))
-    sys.stderr.write(u"\n".encode('utf-8'))
+    sys.stderr.write(unicode(s).encode("utf-8"))
+    sys.stderr.write(b"\n")
     sys.stderr.flush()
 
 
 def extractAlphanumeric(InputString):
-    return "".join([ch for ch in InputString if ch in (string.ascii_letters + string.digits)])
+    return "".join(
+        [ch for ch in InputString if ch in (string.ascii_letters + string.digits)]
+    )
 
 
 def pandoc_wmftosvgpng(key, value, format, meta):
@@ -77,19 +78,19 @@ def pandoc_wmftosvgpng(key, value, format, meta):
     Returns:
         pandocfilters.Image()
     """
-    if key == 'Image':
+    if key == "Image":
         attrs, alt, [src, title] = value
 
-        mediainfopath = os.environ.get('pandoc_filter_mapmedia', None)
+        mediainfopath = os.environ.get("pandoc_filter_mapmedia", None)
         if not mediainfopath:
             return Image(attrs, alt, [src, title])
 
         mediainfo = json.load(file(mediainfopath))
-        srcfolder = mediainfo['srcfull']
-        dstfolder = mediainfo['dstfull']
-        srcsubstr = mediainfo['srcsubstr']
-        dstsubstr = mediainfo['dstsubstr']
-        mediamap = mediainfo['map']
+        srcfolder = mediainfo["srcfull"]
+        dstfolder = mediainfo["dstfull"]
+        mediainfo["srcsubstr"]
+        dstsubstr = mediainfo["dstsubstr"]
+        mediamap = mediainfo["map"]
 
         newsrc = src
         srcfn = os.path.basename(src)
@@ -97,7 +98,7 @@ def pandoc_wmftosvgpng(key, value, format, meta):
         dstfn = mapfn
 
         dstbase, dstext = os.path.splitext(mapfn)
-        prefix = mediainfo['prefix']
+        prefix = mediainfo["prefix"]
         newbase = dstbase[5:].zfill(4)
 
         suffix = ""
@@ -130,5 +131,5 @@ def pandoc_wmftosvgpng(key, value, format, meta):
         return Image(attrs, alt, [src, title])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     toJSONFilter(pandoc_wmftosvgpng)
